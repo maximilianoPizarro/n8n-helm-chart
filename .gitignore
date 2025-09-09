@@ -1,6 +1,5 @@
 /values.*.yaml
 commands.sh
 yamls
-*.tgz
 .idea
 .vscode
