@@ -75,7 +75,7 @@ helm repo add jhipster-online https://maximilianopizarro.github.io/n8n-helm-char
 ```
 
 ```shell
-helm install n8n n8n-openshift/n8n --version 1.15.5
+helm install n8n n8n/n8n --version 1.15.5
 ```
 
 # Examples

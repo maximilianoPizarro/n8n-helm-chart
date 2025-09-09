@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: n8n-anyuid-scc
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups: ["security.openshift.io"]
+  resourceNames: ["anyuid"]
+  resources: ["securitycontextconstraints"]
+  verbs: ["use"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: n8n-anyuid-scc-binding
+  namespace: {{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: n8n-sa
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: n8n-anyuid-scc
+  apiGroup: rbac.authorization.k8s.io
