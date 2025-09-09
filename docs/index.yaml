@@ -9,7 +9,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2025-09-09T17:56:17.2148097-03:00"
+    created: "2025-09-09T19:40:10.6497099-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -18,7 +18,7 @@ entries:
     description: Helm Chart for deploying n8n on Kubernetes, a fair-code workflow
       automation platform with native AI capabilities for technical teams. Easily
       automate tasks across different services.
-    digest: 5066af7ed23731be7a1fa1b9c6e52026be35f5ac0e08387a10a525417959fa9d
+    digest: 6710b9116a58ee8e803cbbe9c7f724194e9292db144c822ac4207392897e8b56
     home: https://github.com/maximilianoPizarro/n8n-helm-chart
     icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
     keywords:
@@ -45,4 +45,4 @@ entries:
     urls:
     - n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2025-09-09T17:56:17.2012998-03:00"
+generated: "2025-09-09T19:40:10.637693-03:00"

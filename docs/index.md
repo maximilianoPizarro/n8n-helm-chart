@@ -71,11 +71,11 @@ There is no restriction, mix and match as you like.
 Install chart
 
 ```shell
-helm repo add jhipster-online https://maximilianopizarro.github.io/n8n-helm-chart/
+helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
 ```
 
 ```shell
-helm install n8n n8n/n8n --version 1.15.5
+helm install n8n n8n-openshift/n8n --version 1.15.5
 ```
 
 # Examples
