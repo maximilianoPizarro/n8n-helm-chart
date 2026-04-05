@@ -27,8 +27,11 @@ container/
 .github/
 # Test values
 values-sandbox-test.yaml
-# Documentation screenshots
+# Documentation (GitHub Pages)
 docs/screenshots/
+docs/*.tgz
+docs/index.md
+docs/index.yaml
 # Workflow examples
 workflows/
 workflow-*.json
