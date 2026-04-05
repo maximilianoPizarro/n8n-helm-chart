@@ -21,7 +21,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.123.28
-    created: "2026-04-05T20:00:37.7968506-03:00"
+    created: "2026-04-05T20:05:01.3923722-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -31,8 +31,8 @@ entries:
       a fair-code workflow automation platform with native AI capabilities for technical
       teams. Easily automate tasks across different services. Includes optional Mailpit
       for email testing and OpenShift Developer Sandbox support.
-    digest: 2f13483f864de91401cb8e0239b2f36e752f54e78a9c0c69fe0692e1ce839fd3
-    home: https://github.com/maximilianoPizarro/n8n-helm-chart
+    digest: b02a7c4ee9d76f3502423ea5a785a1d305e9e08399ea6d9e3f1e0116d0ff62af
+    home: https://maximilianopizarro.github.io/n8n-helm-chart/
     icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
     keywords:
     - Workflow Automation
@@ -69,7 +69,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2026-04-05T20:00:37.7833789-03:00"
+    created: "2026-04-05T20:05:01.3778636-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -105,4 +105,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2026-04-05T20:00:37.7713549-03:00"
+generated: "2026-04-05T20:05:01.3643574-03:00"
