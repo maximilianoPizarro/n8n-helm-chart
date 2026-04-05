@@ -1180,6 +1180,63 @@ minio:
       # set versioning for
       # bucket [true|false]
       versioning: false
+# -- Workflow auto-import configuration. Downloads and imports n8n workflow JSON files after install/upgrade.
+workflows:
+  autoImport:
+    # -- Enable automatic workflow import from URLs after helm install/upgrade
+    enabled: false
+    # -- List of raw GitHub URLs to workflow JSON files
+    urls: []
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor-ai-agent.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-deployment-rollout-status.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-resource-quota-monitor.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-security-audit.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-route-tls-expiry-check.json
+      # - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-event-anomaly-detector.json
+
+# -- Whether to enable Kubernetes service links in pods. Set to false on OpenShift Developer Sandbox to avoid N8N_PORT env conflict.
+enableServiceLinks: false
+
+# -- Mailpit is a lightweight SMTP testing server with a web UI for previewing emails sent by n8n workflows.
+mailpit:
+  # -- Enable Mailpit SMTP test server
+  enabled: false
+  image:
+    # -- Mailpit image repository
+    repository: axllent/mailpit
+    # -- Mailpit image tag
+    tag: "latest"
+    # -- Mailpit image pull policy
+    pullPolicy: IfNotPresent
+  # -- Mailpit service configuration
+  service:
+    # -- Service type for Mailpit
+    type: ClusterIP
+  # -- Mailpit web UI configuration
+  ui:
+    # -- Port for the Mailpit web UI
+    port: 8025
+  # -- Mailpit SMTP configuration
+  smtp:
+    # -- Port for the Mailpit SMTP server
+    port: 1025
+  # -- Mailpit pod security context (use empty for OpenShift)
+  podSecurityContext: {}
+  # -- Mailpit container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+  # -- Mailpit resource limits and requests
+  resources: {}
+  # -- Expose Mailpit UI via OpenShift Route
+  route:
+    enabled: false
+
 nodeSelector: {}
 tolerations: []
 affinity: {}

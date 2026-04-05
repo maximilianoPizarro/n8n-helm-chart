@@ -1,8 +1,11 @@
+{{- if .Values.route.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: n8n-anyuid-scc
+  name: {{ include "n8n.fullname" . }}-anyuid-scc
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
 rules:
 - apiGroups: ["security.openshift.io"]
   resourceNames: ["anyuid"]
@@ -12,13 +15,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: n8n-anyuid-scc-binding
+  name: {{ include "n8n.fullname" . }}-anyuid-scc-binding
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
 subjects:
 - kind: ServiceAccount
-  name: n8n-sa
+  name: {{ include "n8n.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
-  name: n8n-anyuid-scc
+  name: {{ include "n8n.fullname" . }}-anyuid-scc
   apiGroup: rbac.authorization.k8s.io
+{{- end }}

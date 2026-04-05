@@ -17,7 +17,7 @@ metadata:
   {{- end }}
 spec:
   {{- if not .Values.webhook.autoscaling.enabled }}
-  replicas: {{ .Values.webhook.replicaCount }}
+  replicas: {{ .Values.webhook.replicaCount | default .Values.webhook.count }}
   {{- end }}
   strategy:
     type: {{ .Values.webhook.deploymentStrategy.type }}
@@ -49,6 +49,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "n8n.serviceAccountName" . }}
+      {{- if hasKey .Values "enableServiceLinks" }}
+      enableServiceLinks: {{ .Values.enableServiceLinks }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.webhook.podSecurityContext | nindent 8 }}
       {{- if .Values.webhook.initContainers }}

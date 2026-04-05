@@ -3,13 +3,73 @@ entries:
   n8n:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: "Add workflow auto-import Job from n8n-sandbox GitHub repository"
+        - kind: added
+          description: "Add Mailpit as optional SMTP test service"
+        - kind: added
+          description: "Add enableServiceLinks support for Developer Sandbox compatibility"
+        - kind: added
+          description: "Add OpenShift MCP Server workflow examples in documentation"
+        - kind: changed
+          description: "Update n8n app version to 1.123.28"
+        - kind: fixed
+          description: "Fix ClusterIP_ typo in service template"
+        - kind: fixed
+          description: "Fix hardcoded names in role.yaml to use chart naming helpers"
+      artifacthub.io/prerelease: "false"
+      charts.openshift.io/name: n8n
+    apiVersion: v2
+    appVersion: 1.123.28
+    created: "2026-04-05T18:50:07.6655131-03:00"
+    dependencies:
+    - condition: valkey.enabled
+      name: valkey
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.4.7
+    description: Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift,
+      a fair-code workflow automation platform with native AI capabilities for technical
+      teams. Easily automate tasks across different services. Includes optional Mailpit
+      for email testing and OpenShift Developer Sandbox support.
+    digest: 3484a7a2afa014ad5a9c31d8288e08b79da9ccd356dd42c432c76c5b144c49e5
+    home: https://github.com/maximilianoPizarro/n8n-helm-chart
+    icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
+    keywords:
+    - Workflow Automation
+    - Workflow
+    - iPaaS
+    - integration-framework
+    - low-code-plattform
+    - low-code
+    - openshift
+    - mcp-server
+    - ai-workflows
+    kubeVersion: '>=1.20.0'
+    maintainers:
+    - email: maximiliano.pizarro.5@gmail.com
+      name: maximilianoPizarro
+      url: https://github.com/maximilianoPizarro
+    - email: cestay@redhat.com
+      name: pkstaz
+      url: https://github.com/n8n-io
+    name: n8n
+    sources:
+    - https://github.com/maximilianoPizarro/n8n-helm-chart
+    - https://github.com/n8n-io/n8n
+    - https://n8n.io/
+    type: application
+    urls:
+    - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.16.0.tgz
+    version: 1.16.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: "Update n8n app version to 1.109.1"
       artifacthub.io/prerelease: "false"
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2025-09-09T19:40:10.6497099-03:00"
+    created: "2026-04-05T18:50:07.6520019-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -43,6 +103,6 @@ entries:
     - https://n8n.io/
     type: application
     urls:
-    - n8n-1.15.5.tgz
+    - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2025-09-09T19:40:10.637693-03:00"
+generated: "2026-04-05T18:50:07.6394229-03:00"

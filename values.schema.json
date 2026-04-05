@@ -9135,6 +9135,146 @@
       ],
       "title": "workflowHistory",
       "type": "object"
+    },
+    "workflows": {
+      "additionalProperties": false,
+      "description": "Workflow auto-import configuration. Downloads and imports n8n workflow JSON files after install/upgrade.",
+      "properties": {
+        "autoImport": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Enable automatic workflow import from URLs after helm install/upgrade",
+              "type": "boolean"
+            },
+            "urls": {
+              "description": "List of raw GitHub URLs to workflow JSON files",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["enabled", "urls"],
+          "type": "object"
+        }
+      },
+      "required": ["autoImport"],
+      "title": "workflows",
+      "type": "object"
+    },
+    "enableServiceLinks": {
+      "default": false,
+      "description": "Whether to enable Kubernetes service links in pods. Set to false on OpenShift Developer Sandbox to avoid N8N_PORT env conflict.",
+      "title": "enableServiceLinks",
+      "type": "boolean"
+    },
+    "mailpit": {
+      "additionalProperties": false,
+      "description": "Mailpit is a lightweight SMTP testing server with a web UI for previewing emails sent by n8n workflows.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable Mailpit SMTP test server",
+          "type": "boolean"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "default": "axllent/mailpit",
+              "description": "Mailpit image repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "latest",
+              "description": "Mailpit image tag",
+              "type": "string"
+            },
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Mailpit image pull policy",
+              "type": "string"
+            }
+          },
+          "required": ["repository", "tag", "pullPolicy"],
+          "type": "object"
+        },
+        "service": {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for Mailpit",
+              "type": "string"
+            }
+          },
+          "required": ["type"],
+          "type": "object"
+        },
+        "ui": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 8025,
+              "description": "Port for the Mailpit web UI",
+              "type": "integer"
+            }
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "smtp": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 1025,
+              "description": "Port for the Mailpit SMTP server",
+              "type": "integer"
+            }
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Mailpit pod security context (use empty for OpenShift)",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "Mailpit container security context",
+          "type": "object"
+        },
+        "resources": {
+          "description": "Mailpit resource limits and requests",
+          "type": "object"
+        },
+        "route": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Expose Mailpit UI via OpenShift Route",
+              "type": "boolean"
+            }
+          },
+          "required": ["enabled"],
+          "type": "object"
+        }
+      },
+      "required": [
+        "enabled",
+        "image",
+        "service",
+        "ui",
+        "smtp",
+        "podSecurityContext",
+        "securityContext",
+        "resources",
+        "route"
+      ],
+      "title": "mailpit",
+      "type": "object"
     }
   },
   "required": [
@@ -9175,6 +9315,9 @@
     "postgresql",
     "externalPostgresql",
     "minio",
+    "workflows",
+    "enableServiceLinks",
+    "mailpit",
     "nodeSelector",
     "tolerations",
     "affinity",

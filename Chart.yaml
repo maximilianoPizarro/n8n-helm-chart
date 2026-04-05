@@ -1,10 +1,10 @@
 apiVersion: v2
 name: n8n
-version: 1.15.5
-appVersion: 1.109.1
+version: 1.16.0
+appVersion: 1.123.28
 kubeVersion: ">=1.20.0"
 type: application
-description: "Helm Chart for deploying n8n on Kubernetes, a fair-code workflow automation platform with native AI capabilities for technical teams. Easily automate tasks across different services."
+description: "Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift, a fair-code workflow automation platform with native AI capabilities for technical teams. Easily automate tasks across different services. Includes optional Mailpit for email testing and OpenShift Developer Sandbox support."
 home: https://github.com/maximilianoPizarro/n8n-helm-chart
 icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
 keywords:
@@ -14,6 +14,9 @@ keywords:
   - integration-framework
   - low-code-plattform
   - low-code
+  - openshift
+  - mcp-server
+  - ai-workflows
 sources:
   - https://github.com/maximilianoPizarro/n8n-helm-chart
   - https://github.com/n8n-io/n8n
@@ -22,8 +25,8 @@ maintainers:
   - name: maximilianoPizarro
     email: maximiliano.pizarro.5@gmail.com
     url: https://github.com/maximilianoPizarro
-  - name: n8n
-    email: _@8gears.com
+  - name: pkstaz
+    email: cestay@redhat.com
     url: https://github.com/n8n-io
 
 dependencies:
@@ -35,7 +38,18 @@ dependencies:
 annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
-  # supported kinds are added, changed, deprecated, removed, fixed and security.
   artifacthub.io/changes: |
+    - kind: added
+      description: "Add workflow auto-import Job from n8n-sandbox GitHub repository"
+    - kind: added
+      description: "Add Mailpit as optional SMTP test service"
+    - kind: added
+      description: "Add enableServiceLinks support for Developer Sandbox compatibility"
+    - kind: added
+      description: "Add OpenShift MCP Server workflow examples in documentation"
     - kind: changed
-      description: "Update n8n app version to 1.109.1"
+      description: "Update n8n app version to 1.123.28"
+    - kind: fixed
+      description: "Fix ClusterIP_ typo in service template"
+    - kind: fixed
+      description: "Fix hardcoded names in role.yaml to use chart naming helpers"
