@@ -1,9 +1,13 @@
 # -- This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+# Default: docker.io/n8nio/n8n (Alpine-based from Docker Hub)
+# Red Hat UBI alternative: quay.io/maximilianopizarro/n8n (built from container/Containerfile)
+# The UBI image repackages n8nio/n8n:<appVersion> onto registry.access.redhat.com/ubi9/nodejs-22-minimal
 image:
   repository: n8nio/n8n
   # -- This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
+  # This tag is also used as the source version for the quay.io/maximilianopizarro/n8n UBI image build.
   tag: ""
 
 # -- This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
