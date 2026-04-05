@@ -3,7 +3,8 @@ layout: default
 title: n8n Helm Chart for Kubernetes & OpenShift
 ---
 
-<link rel="icon" href="https://raw.githubusercontent.com/maximilianoPizarro/botpress-helm-chart/main/favicon-152.ico" type="image/x-icon">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="https://raw.githubusercontent.com/maximilianoPizarro/botpress-helm-chart/main/favicon-152.ico" type="image/x-icon">
 
 <style>
   :root {
@@ -339,14 +340,32 @@ title: n8n Helm Chart for Kubernetes & OpenShift
 
 <div class="section">
   <h2>Screenshots</h2>
+
+  <h3>OpenShift MCP Server Workflow Examples</h3>
   <div class="screenshot-grid">
     <div class="screenshot-card">
-      <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
-      <div class="caption">n8n Dashboard - Workflow Overview</div>
+      <img src="screenshots/n8n-editor-openshift-pod-monitor-ai-agent-mcp-tools.png" alt="Pod Monitor AI Agent with MCP Tools">
+      <div class="caption">Pod Monitor - AI Agent with MCP Tools</div>
     </div>
     <div class="screenshot-card">
-      <img src="screenshots/n8n-workflows.png" alt="n8n Workflows">
-      <div class="caption">n8n Workflows with MCP Server Integration</div>
+      <img src="screenshots/n8n-editor-openshift-pod-monitor-mcp-granite-email.png" alt="Pod Monitor MCP + Granite + Email">
+      <div class="caption">Pod Monitor - MCP + Granite + Email</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-smtp-test-gmail.png" alt="SMTP Test Workflow">
+      <div class="caption">SMTP Test - Email via Mailpit</div>
+    </div>
+  </div>
+
+  <h3>Dashboard &amp; Services</h3>
+  <div class="screenshot-grid">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-openshift-mcp-workflow-list.png" alt="n8n Workflow List">
+      <div class="caption">n8n Workflow List - OpenShift MCP Workflows</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
+      <div class="caption">n8n Dashboard Overview</div>
     </div>
     <div class="screenshot-card">
       <img src="screenshots/mailpit-ui.png" alt="Mailpit Web UI">
