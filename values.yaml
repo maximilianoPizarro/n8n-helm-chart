@@ -270,6 +270,8 @@ license:
 
 route:
   enabled: true
+  # -- Disable the anyuid SCC Role/RoleBinding creation (required for Developer Sandbox where SCC grants are not allowed)
+  sccRoleDisabled: false
   host: n8n-n8n.apps.rosa.cmzih-zqhto-9xr.zxi0.p3.openshiftapps.com
   tls:
     termination: edge

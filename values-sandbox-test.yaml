@@ -1,0 +1,44 @@
+enableServiceLinks: false
+
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+
+route:
+  enabled: true
+  host: ""
+
+main:
+  service:
+    type: ClusterIP
+    port: 5678
+  persistence:
+    enabled: true
+    existingClaim: n8n
+
+mailpit:
+  enabled: true
+  route:
+    enabled: true
+  podSecurityContext: {}
+
+workflows:
+  autoImport:
+    enabled: true
+    urls:
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor-ai-agent.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-deployment-rollout-status.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-resource-quota-monitor.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-security-audit.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-route-tls-expiry-check.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-event-anomaly-detector.json

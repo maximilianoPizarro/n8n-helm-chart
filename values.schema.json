@@ -2526,6 +2526,12 @@
           "title": "host",
           "type": "string"
         },
+        "sccRoleDisabled": {
+          "default": false,
+          "description": "Disable the anyuid SCC Role/RoleBinding creation (required for Developer Sandbox where SCC grants are not allowed)",
+          "title": "sccRoleDisabled",
+          "type": "boolean"
+        },
         "tls": {
           "additionalProperties": false,
           "properties": {
@@ -2545,6 +2551,7 @@
       },
       "required": [
         "enabled",
+        "sccRoleDisabled",
         "host",
         "tls",
         "annotations"
