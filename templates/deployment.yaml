@@ -99,7 +99,7 @@ spec:
             {{- toYaml .Values.main.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /home/node/.n8n
+              mountPath: {{ .Values.main.persistence.mountPath | default "/home/node/.n8n" }}
           {{- if .Values.main.extraVolumeMounts }}
             {{- toYaml .Values.main.extraVolumeMounts | nindent 12 }}
           {{- end }}

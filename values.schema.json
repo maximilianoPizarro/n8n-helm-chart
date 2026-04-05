@@ -1023,7 +1023,7 @@
           "additionalProperties": false,
           "properties": {
             "n8n": {
-              "additionalProperties": false,
+              "additionalProperties": true,
               "properties": {
                 "editor_base_url": {
                   "default": "",

@@ -15,15 +15,21 @@ securityContext:
 
 route:
   enabled: true
+  sccRoleDisabled: true
   host: ""
 
 main:
+  config:
+    n8n:
+      editor_base_url: ""
+      user_folder: "/data"
   service:
     type: ClusterIP
     port: 5678
   persistence:
     enabled: true
     existingClaim: n8n
+    mountPath: "/data"
 
 mailpit:
   enabled: true
