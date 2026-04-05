@@ -158,26 +158,26 @@ title: n8n Helm Chart for Kubernetes & OpenShift
   }
   .workflow-card .tag.ai { background: #fff0f0; color: var(--n8n-primary); }
   .workflow-card .tag.mcp { background: #f0fff4; color: #059669; }
-  table {
+  .styled-table {
     width: 100%;
     border-collapse: collapse;
     margin: 16px 0;
     font-size: 0.95em;
   }
-  th, td {
+  .styled-table th, .styled-table td {
     padding: 10px 14px;
     text-align: left;
     border-bottom: 1px solid var(--n8n-border);
   }
-  th {
+  .styled-table th {
     background: var(--n8n-secondary);
     color: white;
     font-weight: 600;
   }
-  tr:hover { background: #f9fafb; }
+  .styled-table tr:hover { background: #f9fafb; }
   .arch-diagram {
     background: var(--n8n-dark);
-    color: #e0e0e0;
+    color: #a5f3a0;
     padding: 20px;
     border-radius: 12px;
     overflow-x: auto;
@@ -205,6 +205,43 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     font-size: 1em;
   }
   .step-content { flex: 1; }
+  .code-block {
+    background: #1e1e2e;
+    color: #e0e0e0;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 8px 0;
+  }
+  .screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .screenshot-card {
+    border: 1px solid var(--n8n-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+  .screenshot-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .screenshot-card img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-card .caption {
+    padding: 12px 16px;
+    font-size: 0.9em;
+    color: var(--n8n-muted);
+    background: var(--n8n-light);
+    font-weight: 600;
+  }
   footer.site-footer {
     background: var(--n8n-secondary);
     color: rgba(255,255,255,0.7);
@@ -214,8 +251,6 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     border-radius: 20px 20px 0 0;
   }
   footer.site-footer a { color: var(--n8n-primary); }
-  pre { border-radius: 8px; }
-  code { font-size: 0.9em; }
 </style>
 
 <div class="hero">
@@ -288,13 +323,36 @@ title: n8n Helm Chart for Kubernetes & OpenShift
 </pre>
   </div>
 
-  | Component | Description |
-  |-----------|-------------|
-  | **n8n** | Workflow automation engine deployed via Helm |
-  | **LiteLLM** | OpenAI-compatible proxy routing to Granite/Qwen models |
-  | **OpenShift MCP Server** | MCP server exposing OpenShift/Kubernetes API as tools |
-  | **K8s MCP Server** | Additional Kubernetes-native MCP tool server |
-  | **Mailpit** | Lightweight SMTP test server with web UI (optional) |
+  <table class="styled-table">
+    <thead>
+      <tr><th>Component</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>n8n</strong></td><td>Workflow automation engine deployed via Helm</td></tr>
+      <tr><td><strong>LiteLLM</strong></td><td>OpenAI-compatible proxy routing to Granite/Qwen models</td></tr>
+      <tr><td><strong>OpenShift MCP Server</strong></td><td>MCP server exposing OpenShift/Kubernetes API as tools</td></tr>
+      <tr><td><strong>K8s MCP Server</strong></td><td>Additional Kubernetes-native MCP tool server</td></tr>
+      <tr><td><strong>Mailpit</strong></td><td>Lightweight SMTP test server with web UI (optional)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Screenshots</h2>
+  <div class="screenshot-grid">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
+      <div class="caption">n8n Dashboard - Workflow Overview</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-workflows.png" alt="n8n Workflows">
+      <div class="caption">n8n Workflows with MCP Server Integration</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-ui.png" alt="Mailpit Web UI">
+      <div class="caption">Mailpit - Email Testing Web UI</div>
+    </div>
+  </div>
 </div>
 
 <div class="section" id="installation">
@@ -303,82 +361,43 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     <div class="step-number">1</div>
     <div class="step-content">
       <strong>Add the Helm repository</strong>
-
-```shell
-helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
-helm repo update
-```
-
-</div>
+      <div class="code-block">helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/<br>helm repo update</div>
+    </div>
   </div>
   <div class="install-step">
     <div class="step-number">2</div>
     <div class="step-content">
       <strong>Install the chart</strong>
-
-```shell
-helm install n8n n8n-openshift/n8n --version 1.16.0
-```
-
-</div>
+      <div class="code-block">helm install n8n n8n-openshift/n8n --version 1.16.0</div>
+    </div>
   </div>
   <div class="install-step">
     <div class="step-number">3</div>
     <div class="step-content">
       <strong>Install on OpenShift Developer Sandbox</strong>
-
-```shell
-oc login --token=<your-token> --server=https://api.<cluster>.openshiftapps.com:6443
-helm install n8n n8n-openshift/n8n -f values-sandbox.yaml
-```
-
-</div>
+      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br>helm install n8n n8n-openshift/n8n -f values-sandbox.yaml</div>
+    </div>
   </div>
 </div>
 
 <div class="section">
   <h2>Developer Sandbox Quick Start</h2>
+  <p>For Red Hat OpenShift Developer Sandbox, use these values to ensure compatibility with restricted SCCs:</p>
+  <div class="code-block">enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}</div>
 
-For Red Hat OpenShift Developer Sandbox, use these values to ensure compatibility with restricted SCCs:
-
-```yaml
-enableServiceLinks: false
-
-podSecurityContext: {}
-securityContext:
-  allowPrivilegeEscalation: false
-  capabilities:
-    drop:
-      - ALL
-  readOnlyRootFilesystem: false
-  runAsNonRoot: true
-
-route:
-  enabled: true
-
-main:
-  persistence:
-    enabled: true
-    storageClass: gp3-csi
-    size: 2Gi
-  service:
-    type: ClusterIP
-    port: 5678
-
-mailpit:
-  enabled: true
-  route:
-    enabled: true
-  podSecurityContext: {}
-```
-
-| Setting | Value | Reason |
-|---------|-------|--------|
-| `enableServiceLinks` | `false` | Avoids `N8N_PORT` env conflict in OpenShift |
-| `securityContext.runAsUser` | `null` | OpenShift assigns random UID |
-| `podSecurityContext` | `{}` | No fsGroup (restricted SCC) |
-| `main.persistence.storageClass` | `gp3-csi` | Sandbox default StorageClass |
-| `main.persistence.size` | `2Gi` | Conservative for sandbox quotas |
+  <table class="styled-table">
+    <thead>
+      <tr><th>Setting</th><th>Value</th><th>Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>enableServiceLinks</code></td><td><code>false</code></td><td>Avoids N8N_PORT env conflict in OpenShift</td></tr>
+      <tr><td><code>route.sccRoleDisabled</code></td><td><code>true</code></td><td>Developer Sandbox users cannot create SCC Roles</td></tr>
+      <tr><td><code>main.config.n8n.user_folder</code></td><td><code>/data</code></td><td>Writable path for random UID assigned by OpenShift</td></tr>
+      <tr><td><code>main.persistence.mountPath</code></td><td><code>/data</code></td><td>Mount PVC at writable path instead of /home/node/.n8n</td></tr>
+      <tr><td><code>podSecurityContext</code></td><td><code>{}</code></td><td>No fsGroup (restricted SCC)</td></tr>
+      <tr><td><code>main.persistence.storageClass</code></td><td><code>gp3-csi</code></td><td>Sandbox default StorageClass</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="section">
@@ -396,7 +415,17 @@ mailpit:
   </div>
 
   <div class="workflow-card">
-    <h4>2. Deployment Rollout Status</h4>
+    <h4>2. Pod Monitor - MCP + Granite + Email</h4>
+    <p>Simplified pod monitoring workflow that directly calls the Kubernetes API for pod listing, uses Granite for reasoning, and sends a branded email report.</p>
+    <div class="meta">
+      <span class="tag ai">Granite 3.1 8B</span>
+      <span class="tag mcp">K8s MCP</span>
+      <span class="tag">Manual Trigger</span>
+    </div>
+  </div>
+
+  <div class="workflow-card">
+    <h4>3. Deployment Rollout Status</h4>
     <p>Analyzes all Deployments: replica health (desired vs available vs ready), rollout strategy, container image versions, and last rollout conditions. Flags deployments with replica mismatches.</p>
     <div class="meta">
       <span class="tag ai">Granite 3.1 8B</span>
@@ -406,7 +435,7 @@ mailpit:
   </div>
 
   <div class="workflow-card">
-    <h4>3. Resource Quota Monitor</h4>
+    <h4>4. Resource Quota Monitor</h4>
     <p>Scheduled capacity planning: checks ResourceQuota usage, LimitRange configs, aggregate resource consumption, top consumers, and PVC utilization. Flags resources above 80% threshold.</p>
     <div class="meta">
       <span class="tag ai">Granite 3.1 8B</span>
@@ -416,7 +445,7 @@ mailpit:
   </div>
 
   <div class="workflow-card">
-    <h4>4. Security Audit</h4>
+    <h4>5. Security Audit</h4>
     <p>Namespace security posture assessment: ServiceAccount roles, privilege escalation, SCC usage, NetworkPolicy, Secrets audit, resource limits enforcement, image registry trust. Findings classified as PASS, WARNING, or CRITICAL.</p>
     <div class="meta">
       <span class="tag ai">Granite 3.1 8B</span>
@@ -426,7 +455,7 @@ mailpit:
   </div>
 
   <div class="workflow-card">
-    <h4>5. Route & TLS Expiry Check</h4>
+    <h4>6. Route &amp; TLS Expiry Check</h4>
     <p>Daily check of all Routes and TLS configuration: termination type, certificate expiry, insecure traffic detection. Alerts on certificates expiring within 30 days.</p>
     <div class="meta">
       <span class="tag ai">Granite 3.1 8B</span>
@@ -436,7 +465,7 @@ mailpit:
   </div>
 
   <div class="workflow-card">
-    <h4>6. Event Anomaly Detector</h4>
+    <h4>7. Event Anomaly Detector</h4>
     <p>Runs every 30 minutes to detect anomalous Kubernetes Events: repeated warnings, OOMKilled, FailedScheduling, image pull errors. Conditional email alerts only when anomalies are found.</p>
     <div class="meta">
       <span class="tag ai">Granite 3.1 8B</span>
@@ -451,192 +480,79 @@ mailpit:
 <div class="section">
   <h2>Mailpit Email Output</h2>
   <p>When Mailpit is enabled, n8n workflows can send branded HTML email reports that are captured and viewable in the Mailpit web UI. Configure n8n SMTP credentials to point to the Mailpit service:</p>
-
-```yaml
-# n8n SMTP configuration pointing to Mailpit
-main:
-  config:
-    n8n:
-      smtp_host: "<release-name>-mailpit"
-      smtp_port: "1025"
-      smtp_ssl: "false"
-```
-
+  <div class="code-block">main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_host: "&lt;release-name&gt;-mailpit"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_port: "1025"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_ssl: "false"</div>
   <p>Access the Mailpit web UI via its OpenShift Route to view all captured email reports from your workflows.</p>
 </div>
 
 <div class="section">
   <h2>Configuration</h2>
+  <h3>N8n Configuration via Values</h3>
+  <p>Configuration under <code>main.config:</code> and <code>main.secret:</code> in <code>values.yaml</code> is transformed 1:1 into Kubernetes ENV variables:</p>
+  <div class="code-block">main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;encryption_key: "my_secret"&nbsp;&nbsp;# =&gt; N8N_ENCRYPTION_KEY=my_secret<br>&nbsp;&nbsp;&nbsp;&nbsp;db:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: postgresdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# =&gt; DB_TYPE=postgresdb<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postgresdb:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: 192.168.0.52&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# =&gt; DB_POSTGRESDB_HOST=192.168.0.52</div>
+  <p>Consult the <a href="https://docs.n8n.io/hosting/configuration/environment-variables/">n8n Environment Variables Documentation</a>.</p>
 
-### N8n Configuration via Values
+  <h3>Enabling Mailpit</h3>
+  <div class="code-block">mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true&nbsp;&nbsp;# Expose web UI via OpenShift Route<br>&nbsp;&nbsp;smtp:<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 1025<br>&nbsp;&nbsp;ui:<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 8025</div>
 
-Configuration under `main.config:` and `main.secret:` in `values.yaml` is transformed 1:1 into Kubernetes ENV variables:
+  <h3>Basic Deployment with Ingress</h3>
+  <div class="code-block">ingress:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;hosts:<br>&nbsp;&nbsp;&nbsp;&nbsp;- host: n8n.mydomain.com<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;paths:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- path: /<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pathType: Prefix</div>
 
-```yaml
-main:
-  config:
-    n8n:
-      encryption_key: "my_secret"  # => N8N_ENCRYPTION_KEY=my_secret
-    db:
-      type: postgresdb             # => DB_TYPE=postgresdb
-      postgresdb:
-        host: 192.168.0.52         # => DB_POSTGRESDB_HOST=192.168.0.52
-```
+  <h3>Queue Mode with External Redis</h3>
+  <div class="code-block">db:<br>&nbsp;&nbsp;type: postgresdb<br><br>externalPostgresql:<br>&nbsp;&nbsp;host: "postgresql.example.com"<br>&nbsp;&nbsp;username: "n8nuser"<br>&nbsp;&nbsp;password: "secure-password"<br>&nbsp;&nbsp;database: "n8n"<br><br>worker:<br>&nbsp;&nbsp;mode: queue<br><br>externalRedis:<br>&nbsp;&nbsp;host: "redis.example.com"<br>&nbsp;&nbsp;username: "default"<br>&nbsp;&nbsp;password: "secure-password"</div>
+</div>
 
-Consult the [n8n Environment Variables Documentation](https://docs.n8n.io/hosting/configuration/environment-variables/).
-
-### Enabling Mailpit
-
-```yaml
-mailpit:
-  enabled: true
-  route:
-    enabled: true    # Expose web UI via OpenShift Route
-  smtp:
-    port: 1025
-  ui:
-    port: 8025
-```
-
-### Basic Deployment with Ingress
-
-```yaml
-ingress:
-  enabled: true
-  hosts:
-    - host: n8n.mydomain.com
-      paths:
-        - path: /
-          pathType: Prefix
-```
-
-### Queue Mode with External Redis
-
-```yaml
-db:
-  type: postgresdb
-
-externalPostgresql:
-  host: "postgresql.example.com"
-  username: "n8nuser"
-  password: "secure-password"
-  database: "n8n"
-
-worker:
-  mode: queue
-
-externalRedis:
-  host: "redis.example.com"
-  username: "default"
-  password: "secure-password"
-```
-
-### Full Production Example
-
-```yaml
-enableServiceLinks: false
-
-log:
-  level: warn
-
-db:
-  type: postgresdb
-
-externalPostgresql:
-  host: "postgresql.example.com"
-  username: "n8nuser"
-  password: "secure-password"
-  database: "n8n"
-
-main:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 512m
-      memory: 512Mi
-
-worker:
-  mode: queue
-  autoscaling:
-    enabled: true
-  waitMainNodeReady:
-    enabled: true
-
-externalRedis:
-  host: "redis.example.com"
-  username: "default"
-  password: "secure-password"
-
-ingress:
-  enabled: true
-  hosts:
-    - host: n8n.mydomain.com
-      paths:
-        - path: /
-          pathType: Prefix
-
-mailpit:
-  enabled: true
-  route:
-    enabled: true
-```
+<div class="section">
+  <h2>Container Image</h2>
+  <p>A Red Hat UBI-based container image is available at <code>quay.io/maximilianopizarro/n8n</code>. It clones the official n8n source, builds it, and runs on a Red Hat certified base image (<code>registry.access.redhat.com/ubi9/nodejs-22</code>).</p>
+  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "1.123.28"</div>
+  <p>The image is built automatically via GitHub Actions on every push to <code>main</code>.</p>
 </div>
 
 <div class="section">
   <h2>Requirements</h2>
-
-  | Requirement | Version |
-  |-------------|---------|
-  | Kubernetes | >= 1.20.0 |
-  | Helm | >= 3.8 |
-  | Database | SQLite (embedded) or PostgreSQL |
-
-  | Dependency | Version | Condition |
-  |------------|---------|-----------|
-  | Valkey (Bitnami) | 2.4.7 | `valkey.enabled` |
+  <table class="styled-table">
+    <thead>
+      <tr><th>Requirement</th><th>Version</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Kubernetes</td><td>&gt;= 1.20.0</td></tr>
+      <tr><td>Helm</td><td>&gt;= 3.8</td></tr>
+      <tr><td>Database</td><td>SQLite (embedded) or PostgreSQL</td></tr>
+    </tbody>
+  </table>
+  <table class="styled-table">
+    <thead>
+      <tr><th>Dependency</th><th>Version</th><th>Condition</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Valkey (Bitnami)</td><td>2.4.7</td><td><code>valkey.enabled</code></td></tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="section">
   <h2>Chart Verification</h2>
   <p>This chart is verified with the Red Hat Community Helm Chart certification process:</p>
-
-```bash
-podman run --rm -i \
-  -e KUBECONFIG=/.kube/config:z \
-  -v "$HOME/.kube":/.kube:z \
-  "quay.io/redhat-certification/chart-verifier" \
-  verify --set profile.vendorType=community,profile.version=v1.1 \
-  https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.16.0.tgz
-```
+  <div class="code-block">podman run --rm -i \<br>&nbsp;&nbsp;-e KUBECONFIG=/.kube/config \<br>&nbsp;&nbsp;-v "$HOME/.kube":/.kube:z \<br>&nbsp;&nbsp;"quay.io/redhat-certification/chart-verifier" \<br>&nbsp;&nbsp;verify --set profile.vendorType=community,profile.version=v1.1 \<br>&nbsp;&nbsp;https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.16.0.tgz</div>
 </div>
 
 <div class="section">
   <h2>Upgrading</h2>
-
-### Version 1.16.0
-
-**New Features:**
-- Mailpit as optional SMTP test service
-- `enableServiceLinks` for Developer Sandbox compatibility
-- OpenShift MCP Server workflow examples
-- Dynamic naming in RBAC resources (no more hardcoded `n8n-sa`)
-
-**Breaking Changes:**
-- `role.yaml` now uses chart naming helpers instead of hardcoded names. If you were referencing `n8n-anyuid-scc` or `n8n-sa` directly, update to use the release-based names.
-
-### Uninstall
-
-```console
-helm uninstall [RELEASE_NAME]
-```
-
-### Upgrade
-
-```console
-helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.16.0
-```
+  <h3>Version 1.16.0</h3>
+  <p><strong>New Features:</strong></p>
+  <ul>
+    <li>Mailpit as optional SMTP test service</li>
+    <li><code>enableServiceLinks</code> for Developer Sandbox compatibility</li>
+    <li>OpenShift MCP Server workflow examples with auto-import</li>
+    <li>Dynamic naming in RBAC resources</li>
+    <li>Configurable volume mount path (<code>main.persistence.mountPath</code>)</li>
+    <li><code>route.sccRoleDisabled</code> for Developer Sandbox RBAC compatibility</li>
+    <li>Red Hat UBI-based container image at <code>quay.io/maximilianopizarro/n8n</code></li>
+  </ul>
+  <h3>Uninstall</h3>
+  <div class="code-block">helm uninstall [RELEASE_NAME]</div>
+  <h3>Upgrade</h3>
+  <div class="code-block">helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.16.0</div>
 </div>
 
 <footer class="site-footer">

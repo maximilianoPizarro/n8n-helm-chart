@@ -21,3 +21,11 @@
 .idea/
 *.tmproj
 .vscode/
+# Container build files
+container/
+# GitHub Actions
+.github/
+# Test values
+values-sandbox-test.yaml
+# Documentation screenshots
+docs/screenshots/

@@ -1,0 +1,69 @@
+name: Build and Push n8n UBI Container Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'container/**'
+      - '.github/workflows/build-container.yaml'
+  workflow_dispatch:
+    inputs:
+      n8n_version:
+        description: 'n8n version to build'
+        required: false
+        default: '1.123.28'
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: maximilianopizarro/n8n
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set n8n version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.n8n_version }}" ]; then
+            echo "N8N_VERSION=${{ github.event.inputs.n8n_version }}" >> $GITHUB_OUTPUT
+          else
+            VERSION=$(grep '^appVersion:' Chart.yaml | awk '{print $2}' | tr -d '"')
+            echo "N8N_VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to Red Hat Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.redhat.io
+          username: ${{ secrets.REDHAT_REGISTRY_USERNAME }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
+
+      - name: Log in to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        id: build
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ steps.version.outputs.N8N_VERSION }}
+            latest
+          containerfiles: |
+            ./container/Containerfile
+          build-args: |
+            N8N_VERSION=${{ steps.version.outputs.N8N_VERSION }}
+
+      - name: Push to Quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build.outputs.image }}
+          tags: ${{ steps.build.outputs.tags }}
+          registry: ${{ env.REGISTRY }}

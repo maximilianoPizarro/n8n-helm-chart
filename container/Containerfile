@@ -1,0 +1,58 @@
+FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS builder
+
+USER 0
+
+ARG N8N_VERSION=1.123.28
+
+RUN dnf install -y git python3 make gcc gcc-c++ && \
+    dnf clean all
+
+RUN npm install -g pnpm@9
+
+WORKDIR /build
+
+RUN git clone --depth 1 --branch n8n@${N8N_VERSION} https://github.com/n8n-io/n8n.git .
+
+RUN pnpm install --frozen-lockfile && \
+    pnpm build
+
+RUN pnpm deploy --filter=n8n --prod /app && \
+    cp -r packages/cli/dist /app/dist && \
+    cp -r packages/cli/templates /app/templates 2>/dev/null || true
+
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
+
+LABEL name="n8n" \
+      vendor="n8n GmbH" \
+      version="${N8N_VERSION}" \
+      summary="n8n workflow automation on Red Hat UBI" \
+      description="n8n is a fair-code workflow automation tool, built on Red Hat UBI 9 with Node.js 22" \
+      io.k8s.display-name="n8n Workflow Automation" \
+      io.k8s.description="n8n workflow automation on Red Hat UBI 9" \
+      io.openshift.tags="n8n,workflow,automation,ai,mcp"
+
+USER 0
+
+RUN microdnf install -y shadow-utils && \
+    microdnf clean all && \
+    useradd -r -u 1000 -g 0 -s /sbin/nologin -d /home/node node && \
+    mkdir -p /home/node/.n8n /data && \
+    chown -R 1000:0 /home/node /data && \
+    chmod -R g=u /home/node /data
+
+COPY --from=builder --chown=1000:0 /app /usr/local/lib/node_modules/n8n
+
+RUN ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n && \
+    chmod +x /usr/local/lib/node_modules/n8n/bin/n8n
+
+ENV N8N_USER_FOLDER=/data \
+    N8N_PORT=5678 \
+    NODE_ENV=production
+
+EXPOSE 5678
+
+USER 1000
+
+WORKDIR /home/node
+
+ENTRYPOINT ["n8n"]
