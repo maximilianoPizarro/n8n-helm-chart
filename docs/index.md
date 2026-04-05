@@ -233,6 +233,7 @@ title: n8n Helm Chart for Kubernetes & OpenShift
   .screenshot-card img {
     width: 100%;
     display: block;
+    cursor: zoom-in;
   }
   .screenshot-card .caption {
     padding: 12px 16px;
@@ -240,6 +241,57 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     color: var(--n8n-muted);
     background: var(--n8n-light);
     font-weight: 600;
+  }
+  .lightbox-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 9999;
+    cursor: zoom-out;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .lightbox-overlay.active {
+    display: flex;
+  }
+  .lightbox-overlay img {
+    max-width: 95%;
+    max-height: 95vh;
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    object-fit: contain;
+  }
+  .lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    color: white;
+    font-size: 36px;
+    font-weight: 300;
+    cursor: pointer;
+    z-index: 10000;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+  .lightbox-caption {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 0.95em;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 20px;
+    border-radius: 20px;
+    z-index: 10000;
   }
   footer.site-footer {
     background: var(--n8n-secondary);
@@ -260,6 +312,8 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     <img src="https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes">
     <img src="https://img.shields.io/badge/helm-0db7ed?style=for-the-badge&logo=helm&logoColor=white" alt="Helm">
     <a href="https://artifacthub.io/packages/search?repo=n8n-openshift"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/n8n-openshift" alt="Artifact Hub"></a>
+    <a href="https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/openshift-mcp-server" alt="OpenShift MCP Server on Artifact Hub"></a>
+    <a href="https://quay.io/repository/maximilianopizarro/n8n"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fquay.io%2Fapi%2Fv1%2Frepository%2Fmaximilianopizarro%2Fn8n%2Ftag%2F&query=%24.tags.length&suffix=%20tags&label=quay.io&color=EE0000&logo=redhat&logoColor=white" alt="Quay.io Tags"></a>
   </div>
   <div class="cta-buttons">
     <a href="#installation" class="cta-btn cta-primary">Get Started</a>
@@ -410,8 +464,20 @@ graph LR
       <div class="caption">n8n Dashboard Overview</div>
     </div>
     <div class="screenshot-card">
-      <img src="screenshots/mailpit-ui.png" alt="Mailpit Web UI">
-      <div class="caption">Mailpit - Email Testing Web UI</div>
+      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
+      <div class="caption">Mailpit Inbox - Workflow Email Reports</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-email-detail.png" alt="Mailpit Email Detail - Pod Status Report">
+      <div class="caption">Pod Status Report - HTML Email via Mailpit</div>
+    </div>
+  </div>
+
+  <h3>MCP Inspector - Tool Verification</h3>
+  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
+    <div class="screenshot-card">
+      <img src="screenshots/mcp-inspector-monitor-deployments.png" alt="MCP Inspector - monitorDeployments tool output">
+      <div class="caption">MCP Inspector - monitorDeployments: 11 deployments healthy, 0 issues</div>
     </div>
   </div>
 </div>
@@ -463,79 +529,102 @@ graph LR
 
 <div class="section">
   <h2>OpenShift MCP Server Workflow Examples</h2>
-  <p>These workflows query the Kubernetes API through the MCP (Model Context Protocol) server, feed the results to an IBM Granite 3.1 8B model for analysis, and deliver a branded HTML email report via Mailpit.</p>
+  <p>Each workflow follows a <strong>6-node pipeline</strong> that calls MCP Server tools directly via JSON-RPC, passes real cluster data to an AI model for analysis, and delivers a branded HTML email report through Mailpit:</p>
+  <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Trigger → Set Parameters → <strong>MCP Tool Call</strong> (JSON-RPC) → <strong>AI Analysis</strong> (LiteLLM) → Build HTML Report → Send via Mailpit</div>
 
   <div class="workflow-card">
     <h4>1. Pod Monitor - AI Agent with MCP Tools</h4>
-    <p>Queries all pods in the namespace via MCP tools, analyzes status with Granite AI (running, pending, CrashLoopBackOff), and sends an HTML email report with Red Hat branding.</p>
+    <p>Calls <code>pods_list</code> via K8s MCP Server (JSON-RPC over Streamable HTTP) to retrieve all pods in the namespace, then passes the real pod data to Granite/Qwen3 for status analysis and sends a branded HTML email via Mailpit API.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">OpenShift MCP</span>
+      <span class="tag mcp">MCP: pods_list</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>2. Pod Monitor - MCP + Granite + Email</h4>
-    <p>Simplified pod monitoring workflow that directly calls the Kubernetes API for pod listing, uses Granite for reasoning, and sends a branded email report.</p>
+    <p>Calls <code>monitorDeployments</code> via Quarkus MCP Server to get deployment health metrics, then uses AI to analyze healthy vs unhealthy deployments, replica mismatches, and sends the report via Mailpit.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">K8s MCP</span>
+      <span class="tag mcp">MCP: monitorDeployments</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>3. Deployment Rollout Status</h4>
-    <p>Analyzes all Deployments: replica health (desired vs available vs ready), rollout strategy, container image versions, and last rollout conditions. Flags deployments with replica mismatches.</p>
+    <p>Calls <code>monitorDeployments</code> to retrieve real-time deployment data, then AI analyzes replica health (desired vs available vs ready), rollout strategy, container image versions, and flags deployments with mismatches.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">K8s MCP</span>
+      <span class="tag mcp">MCP: monitorDeployments</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>4. Resource Quota Monitor</h4>
-    <p>Scheduled capacity planning: checks ResourceQuota usage, LimitRange configs, aggregate resource consumption, top consumers, and PVC utilization. Flags resources above 80% threshold.</p>
+    <p>Calls <code>getPerformanceMetrics</code> via Quarkus MCP Server every 6 hours, then AI analyzes CPU/memory utilization, ResourceQuota limits vs usage, top resource consumers. Flags resources above 80% threshold.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">OpenShift MCP</span>
+      <span class="tag mcp">MCP: getPerformanceMetrics</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Schedule (6h)</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>5. Security Audit</h4>
-    <p>Namespace security posture assessment: ServiceAccount roles, privilege escalation, SCC usage, NetworkPolicy, Secrets audit, resource limits enforcement, image registry trust. Findings classified as PASS, WARNING, or CRITICAL.</p>
+    <p>Calls <code>checkClusterHealth</code> via Quarkus MCP Server, then AI performs a security posture assessment following CIS benchmarks: ServiceAccount roles, SCC usage, NetworkPolicy, Secrets audit. Findings classified as PASS, WARNING, or CRITICAL.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">OpenShift MCP</span>
+      <span class="tag mcp">MCP: checkClusterHealth</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>6. Route &amp; TLS Expiry Check</h4>
-    <p>Daily check of all Routes and TLS configuration: termination type, certificate expiry, insecure traffic detection. Alerts on certificates expiring within 30 days.</p>
+    <p>Calls <code>resources_list</code> (resource_type: routes) via K8s MCP Server daily, then AI analyzes route configuration, TLS termination types, and certificate expiry. Alerts on certificates expiring within 30 days.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">OpenShift MCP</span>
+      <span class="tag mcp">MCP: resources_list</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Schedule (daily)</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>7. Event Anomaly Detector</h4>
-    <p>Runs every 30 minutes to detect anomalous Kubernetes Events: repeated warnings, OOMKilled, FailedScheduling, image pull errors. Conditional email alerts only when anomalies are found.</p>
+    <p>Calls <code>events_list</code> via K8s MCP Server every 30 minutes, then AI detects anomalous Kubernetes Events: repeated warnings, OOMKilled, FailedScheduling, image pull errors. Conditional alerts only when anomalies are found.</p>
     <div class="meta">
-      <span class="tag ai">Granite 3.1 8B</span>
-      <span class="tag mcp">K8s MCP</span>
+      <span class="tag mcp">MCP: events_list</span>
+      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Mailpit</span>
       <span class="tag">Schedule (30min)</span>
     </div>
   </div>
 
-  <p>Find all workflow JSON files in the <a href="https://github.com/maximilianoPizarro/n8n-sandbox/tree/main/workflows">n8n-sandbox repository</a>.</p>
+  <table class="styled-table">
+    <thead>
+      <tr><th>#</th><th>Workflow</th><th>MCP Tool</th><th>MCP Server</th><th>Trigger</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Pod Monitor - AI Agent</td><td><code>pods_list</code></td><td>K8s MCP (8085)</td><td>Manual</td></tr>
+      <tr><td>2</td><td>Pod Monitor - MCP + Granite</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
+      <tr><td>3</td><td>Deployment Rollout Status</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
+      <tr><td>4</td><td>Resource Quota Monitor</td><td><code>getPerformanceMetrics</code></td><td>Quarkus MCP (8080)</td><td>Schedule (6h)</td></tr>
+      <tr><td>5</td><td>Security Audit</td><td><code>checkClusterHealth</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
+      <tr><td>6</td><td>Route &amp; TLS Expiry</td><td><code>resources_list</code></td><td>K8s MCP (8085)</td><td>Schedule (daily)</td></tr>
+      <tr><td>7</td><td>Event Anomaly Detector</td><td><code>events_list</code></td><td>K8s MCP (8085)</td><td>Schedule (30min)</td></tr>
+    </tbody>
+  </table>
+
+  <p>Find all workflow JSON files in the <a href="https://github.com/maximilianoPizarro/n8n-helm-chart/tree/main/workflows">workflows directory</a> or in the <a href="https://github.com/maximilianoPizarro/n8n-sandbox/tree/main/workflows">n8n-sandbox repository</a>.</p>
 </div>
 
 <div class="section">
@@ -543,6 +632,59 @@ graph LR
   <p>When Mailpit is enabled, n8n workflows can send branded HTML email reports that are captured and viewable in the Mailpit web UI. Configure n8n SMTP credentials to point to the Mailpit service:</p>
   <div class="code-block">main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_host: "&lt;release-name&gt;-mailpit"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_port: "1025"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_ssl: "false"</div>
   <p>Access the Mailpit web UI via its OpenShift Route to view all captured email reports from your workflows.</p>
+  <div class="screenshot-grid">
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
+      <div class="caption">Mailpit Inbox - Workflow Email Reports</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report Email">
+      <div class="caption">Pod Status Report - Rendered HTML Email</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>OpenShift MCP Server</h2>
+  <p>The workflows above require the <a href="https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server">OpenShift MCP Server</a> Helm chart deployed in your cluster. It provides a dual MCP server deployment: a custom Quarkus server (19 operational tools) and the official <a href="https://github.com/openshift/openshift-mcp-server">openshift/openshift-mcp-server</a> (20+ Kubernetes tools), plus an MCP Inspector UI and LiteLLM proxy.</p>
+  <div class="badges" style="margin:16px 0;">
+    <a href="https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/openshift-mcp-server" alt="OpenShift MCP Server on Artifact Hub"></a>
+  </div>
+  <div class="install-step">
+    <div class="step-number">1</div>
+    <div class="step-content">
+      <strong>Add the Helm repository</strong>
+      <div class="code-block">helm repo add openshift-mcp https://maximilianoPizarro.github.io/openshift-mcp-server<br>helm repo update</div>
+    </div>
+  </div>
+  <div class="install-step">
+    <div class="step-number">2</div>
+    <div class="step-content">
+      <strong>Install the OpenShift MCP Server</strong>
+      <div class="code-block">helm install openshift-mcp-server openshift-mcp/openshift-mcp-server \<br>&nbsp;&nbsp;--namespace openshift-lightspeed \<br>&nbsp;&nbsp;--create-namespace \<br>&nbsp;&nbsp;--set namespace=openshift-lightspeed</div>
+    </div>
+  </div>
+  <div class="install-step">
+    <div class="step-number">3</div>
+    <div class="step-content">
+      <strong>Install on Developer Sandbox (same namespace as n8n)</strong>
+      <div class="code-block">helm install openshift-mcp-server openshift-mcp/openshift-mcp-server \<br>&nbsp;&nbsp;--set namespace=&lt;your-sandbox-namespace&gt;</div>
+    </div>
+  </div>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Component</th><th>Port</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Quarkus MCP Server</strong></td><td>8080</td><td>19 tools: monitoring, deployment, performance testing</td></tr>
+      <tr><td><strong>K8s MCP Server</strong></td><td>8085</td><td>20+ tools: CRUD, pods, helm, events, nodes</td></tr>
+      <tr><td><strong>MCP Inspector</strong></td><td>8080</td><td>Web UI for testing MCP tools interactively</td></tr>
+      <tr><td><strong>LiteLLM Proxy</strong></td><td>4000</td><td>OpenAI-compatible proxy for Granite/Qwen3 models</td></tr>
+    </tbody>
+  </table>
+
+  <p>Full documentation: <a href="https://maximilianopizarro.github.io/openshift-mcp-server">maximilianopizarro.github.io/openshift-mcp-server</a></p>
 </div>
 
 <div class="section">
@@ -591,30 +733,94 @@ graph LR
   </table>
 </div>
 
-<div class="section">
-  <h2>Chart Verification</h2>
-  <p>This chart is verified with the Red Hat Community Helm Chart certification process:</p>
-  <div class="code-block">podman run --rm -i \<br>&nbsp;&nbsp;-e KUBECONFIG=/.kube/config \<br>&nbsp;&nbsp;-v "$HOME/.kube":/.kube:z \<br>&nbsp;&nbsp;"quay.io/redhat-certification/chart-verifier" \<br>&nbsp;&nbsp;verify --set profile.vendorType=community,profile.version=v1.1 \<br>&nbsp;&nbsp;https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.16.0.tgz</div>
-</div>
 
 <div class="section">
-  <h2>Upgrading</h2>
-  <h3>Version 1.16.0</h3>
-  <p><strong>New Features:</strong></p>
+  <h2>Release Notes</h2>
+
+  <h3>v1.16.0 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 1.123.28)</span></h3>
+
+  <h4 style="color:var(--n8n-green);margin-top:20px;">Added</h4>
   <ul>
-    <li>Mailpit as optional SMTP test service</li>
-    <li><code>enableServiceLinks</code> for Developer Sandbox compatibility</li>
-    <li>OpenShift MCP Server workflow examples with auto-import</li>
-    <li>Dynamic naming in RBAC resources</li>
-    <li>Configurable volume mount path (<code>main.persistence.mountPath</code>)</li>
-    <li><code>route.sccRoleDisabled</code> for Developer Sandbox RBAC compatibility</li>
-    <li>Red Hat UBI-based container image at <code>quay.io/maximilianopizarro/n8n</code></li>
+    <li><strong>OpenShift MCP Server integration</strong> — 7 workflows calling MCP tools directly via JSON-RPC (<code>pods_list</code>, <code>monitorDeployments</code>, <code>getPerformanceMetrics</code>, <code>checkClusterHealth</code>, <code>events_list</code>, <code>resources_list</code>) with AI analysis (Granite/Qwen3 via LiteLLM) and branded HTML email reports via Mailpit</li>
+    <li><strong>Workflow auto-import Job</strong> — Helm post-install hook downloads and imports workflow JSON files from <a href="https://github.com/maximilianoPizarro/n8n-sandbox">n8n-sandbox</a></li>
+    <li><strong>Mailpit</strong> — Optional SMTP test server with web UI for previewing email reports without external email infrastructure</li>
+    <li><strong>Developer Sandbox compatibility</strong> — <code>enableServiceLinks: false</code> to avoid <code>N8N_PORT</code> env conflict, <code>route.sccRoleDisabled</code> for restricted RBAC, empty <code>podSecurityContext</code> for random UID</li>
+    <li><strong>Red Hat UBI container image</strong> — Built on <code>registry.access.redhat.com/ubi9/nodejs-22</code>, published at <code>quay.io/maximilianopizarro/n8n</code> via GitHub Actions</li>
+    <li><strong>Configurable volume mount path</strong> — <code>main.persistence.mountPath</code> for writable paths in restricted environments</li>
+    <li><strong>Chart Verifier CI</strong> — GitHub Actions workflow runs Red Hat Community Helm Chart verification on every push</li>
   </ul>
+
+  <h4 style="color:var(--n8n-blue);margin-top:20px;">Changed</h4>
+  <ul>
+    <li>Updated n8n app version to <strong>1.123.28</strong></li>
+    <li>Dynamic naming in RBAC resources using chart naming helpers</li>
+    <li>Architecture diagram updated to Mermaid with MCP Server and AI layer</li>
+    <li>GitHub Pages documentation redesigned with n8n-inspired style, lightbox image viewer, and MCP workflow pipeline documentation</li>
+  </ul>
+
+  <h4 style="color:var(--n8n-primary);margin-top:20px;">Fixed</h4>
+  <ul>
+    <li>Fixed <code>ClusterIP_</code> typo in service template</li>
+    <li>Fixed hardcoded names in <code>role.yaml</code> to use chart naming helpers (supports <code>n8n-dev-east</code> style release names)</li>
+  </ul>
+
+  <h4 style="margin-top:24px;">Email Report Screenshots</h4>
+  <p>Actual email reports generated by the MCP workflows and captured in Mailpit:</p>
+  <div class="screenshot-grid">
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox - 3 workflow email reports">
+      <div class="caption">Mailpit Inbox — Resource Quota, Security Audit, Pod Status reports</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report - branded HTML email with pod table">
+      <div class="caption">Pod Status Report — Red Hat branded HTML with pod health table, AI analysis by Granite 3.1 8B</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:32px;">Upgrade</h3>
+  <div class="code-block">helm repo update<br>helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.16.0</div>
   <h3>Uninstall</h3>
   <div class="code-block">helm uninstall [RELEASE_NAME]</div>
-  <h3>Upgrade</h3>
-  <div class="code-block">helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.16.0</div>
 </div>
+
+<div class="lightbox-overlay" id="lightbox">
+  <span class="lightbox-close" id="lightbox-close">&times;</span>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lightbox-img');
+  var lbCap = document.getElementById('lightbox-caption');
+  var lbClose = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('.screenshot-card img').forEach(function(img){
+    img.addEventListener('click', function(){
+      lbImg.src = this.src;
+      lbImg.alt = this.alt;
+      var caption = this.closest('.screenshot-card').querySelector('.caption');
+      lbCap.textContent = caption ? caption.textContent : this.alt;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeLightbox(){
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay || e.target === lbImg) closeLightbox();
+  });
+  lbClose.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeLightbox();
+  });
+})();
+</script>
 
 <footer class="site-footer">
   <p><strong>n8n Helm Chart</strong> &mdash; Maintained by <a href="https://github.com/maximilianoPizarro">maximilianoPizarro</a></p>

@@ -41,10 +41,10 @@ workflows:
   autoImport:
     enabled: true
     urls:
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor-ai-agent.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-openshift-pod-monitor.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-deployment-rollout-status.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-resource-quota-monitor.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-security-audit.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-route-tls-expiry-check.json
-      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-sandbox/main/workflows/workflow-event-anomaly-detector.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-agent.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-granite.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-deployment-rollout-status.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-resource-quota-monitor.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-security-audit.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-route-tls-expiry.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-event-anomaly-detector.json

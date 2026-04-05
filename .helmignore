@@ -29,3 +29,6 @@ container/
 values-sandbox-test.yaml
 # Documentation screenshots
 docs/screenshots/
+# Workflow examples
+workflows/
+workflow-*.json

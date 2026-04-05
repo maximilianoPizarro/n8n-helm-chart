@@ -21,6 +21,7 @@ sources:
   - https://github.com/maximilianoPizarro/n8n-helm-chart
   - https://github.com/n8n-io/n8n
   - https://n8n.io/
+  - https://github.com/maximilianoPizarro/openshift-mcp-server
 maintainers:
   - name: maximilianoPizarro
     email: maximiliano.pizarro.5@gmail.com
@@ -40,16 +41,48 @@ annotations:
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
     - kind: added
-      description: "Add workflow auto-import Job from n8n-sandbox GitHub repository"
+      description: "Add 7 MCP Server workflows with real JSON-RPC tool calls (pods_list, monitorDeployments, getPerformanceMetrics, checkClusterHealth, events_list, resources_list) + AI analysis via LiteLLM + Mailpit email reports"
     - kind: added
-      description: "Add Mailpit as optional SMTP test service"
+      description: "Add workflow auto-import Job (Helm post-install hook) from n8n-sandbox GitHub repository"
     - kind: added
-      description: "Add enableServiceLinks support for Developer Sandbox compatibility"
+      description: "Add Mailpit as optional SMTP test service with OpenShift Route support"
     - kind: added
-      description: "Add OpenShift MCP Server workflow examples in documentation"
+      description: "Add enableServiceLinks for Developer Sandbox N8N_PORT env conflict resolution"
+    - kind: added
+      description: "Add route.sccRoleDisabled for Developer Sandbox RBAC compatibility"
+    - kind: added
+      description: "Add Red Hat UBI container image at quay.io/maximilianopizarro/n8n via GitHub Actions CI"
+    - kind: added
+      description: "Add Chart Verifier GitHub Actions workflow for Red Hat Community certification"
+    - kind: added
+      description: "Add configurable volume mount path (main.persistence.mountPath) for restricted environments"
     - kind: changed
       description: "Update n8n app version to 1.123.28"
+    - kind: changed
+      description: "Redesign GitHub Pages documentation with MCP pipeline architecture, lightbox viewer, and Mermaid diagrams"
     - kind: fixed
       description: "Fix ClusterIP_ typo in service template"
     - kind: fixed
-      description: "Fix hardcoded names in role.yaml to use chart naming helpers"
+      description: "Fix hardcoded names in role.yaml to use chart naming helpers (supports n8n-dev-east style release names)"
+  artifacthub.io/screenshots: |
+    - title: Mailpit Inbox - Workflow Email Reports
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mailpit-inbox.png
+    - title: Pod Status Report - Red Hat Branded HTML Email
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mailpit-email-detail.png
+    - title: MCP Inspector - monitorDeployments Verification
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mcp-inspector-monitor-deployments.png
+    - title: n8n All Workflows List
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-all-workflows-list.png
+    - title: n8n Dashboard
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-dashboard.png
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://maximilianopizarro.github.io/n8n-helm-chart/
+    - name: OpenShift MCP Server
+      url: https://maximilianopizarro.github.io/openshift-mcp-server
+    - name: OpenShift MCP Server (Artifact Hub)
+      url: https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server
+    - name: n8n Sandbox Workflows
+      url: https://github.com/maximilianoPizarro/n8n-sandbox
