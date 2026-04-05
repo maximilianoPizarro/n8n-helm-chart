@@ -177,14 +177,12 @@ title: n8n Helm Chart for Kubernetes & OpenShift
   }
   .styled-table tr:hover { background: #f9fafb; }
   .arch-diagram {
-    background: var(--n8n-dark);
-    color: #a5f3a0;
+    background: white;
     padding: 20px;
     border-radius: 12px;
+    border: 1px solid var(--n8n-border);
     overflow-x: auto;
-    font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 0.85em;
-    line-height: 1.4;
+    text-align: center;
   }
   .install-step {
     display: flex;
@@ -305,23 +303,43 @@ title: n8n Helm Chart for Kubernetes & OpenShift
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme:'base', themeVariables:{primaryColor:'#ff6d5a',primaryTextColor:'#fff',primaryBorderColor:'#ea4b71',lineColor:'#6b7280',secondaryColor:'#1a1a2e',tertiaryColor:'#f5f5f5',fontFamily:'Inter,sans-serif'}});</script>
+
 <div class="section">
   <h2>Architecture</h2>
   <div class="arch-diagram">
-<pre>
-┌──────────────┐     ┌────────────────────┐     ┌──────────────────┐     ┌──────────────┐
-│   n8n        │────▶│  LiteLLM Proxy     │────▶│  OpenShift MCP   │────▶│  Kubernetes  │
-│   Workflow   │     │  + Granite 3.1 8B  │     │  Server          │     │  API         │
-│   Engine     │     │  + Qwen 3 8B       │     │  + K8s MCP       │     │              │
-└──────┬───────┘     └────────────────────┘     └──────────────────┘     └──────────────┘
-       │
-       ▼
-┌──────────────┐
-│  Mailpit     │
-│  SMTP/Web UI │
-│  (Optional)  │
-└──────────────┘
-</pre>
+    <div class="mermaid">
+graph LR
+  subgraph HELM["n8n Helm Chart"]
+    N8N["🔧 n8n<br/>Workflow Engine<br/><i>n8nio/n8n</i>"]
+    MAIL["✉️ Mailpit<br/>SMTP Test Server<br/><i>Optional</i>"]
+    PVC["💾 PVC<br/>Persistent Data"]
+  end
+
+  subgraph AI["AI & MCP Layer"]
+    LITE["🤖 LiteLLM Proxy<br/>OpenAI-compatible"]
+    GRANITE["🧠 IBM Granite 3.1 8B"]
+    QWEN["🧠 Qwen 3 8B"]
+  end
+
+  subgraph MCP["MCP Servers"]
+    OSMCP["☸️ OpenShift MCP<br/>Server"]
+    K8SMCP["☸️ K8s MCP<br/>Server"]
+  end
+
+  K8SAPI["☁️ Kubernetes API"]
+
+  N8N -->|"AI Analysis"| LITE
+  N8N -->|"Email Reports"| MAIL
+  N8N --- PVC
+  LITE --> GRANITE
+  LITE --> QWEN
+  N8N -->|"MCP Tools"| OSMCP
+  N8N -->|"MCP Tools"| K8SMCP
+  OSMCP --> K8SAPI
+  K8SMCP --> K8SAPI
+    </div>
   </div>
 
   <table class="styled-table">
@@ -341,15 +359,43 @@ title: n8n Helm Chart for Kubernetes & OpenShift
 <div class="section">
   <h2>Screenshots</h2>
 
+  <h3>All Workflows</h3>
+  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-all-workflows-list.png" alt="All 8 OpenShift MCP Workflows">
+      <div class="caption">n8n - 8 OpenShift MCP Server Workflows Imported</div>
+    </div>
+  </div>
+
   <h3>OpenShift MCP Server Workflow Examples</h3>
   <div class="screenshot-grid">
     <div class="screenshot-card">
       <img src="screenshots/n8n-editor-openshift-pod-monitor-ai-agent-mcp-tools.png" alt="Pod Monitor AI Agent with MCP Tools">
-      <div class="caption">Pod Monitor - AI Agent with MCP Tools</div>
+      <div class="caption">1. Pod Monitor - AI Agent with MCP Tools</div>
     </div>
     <div class="screenshot-card">
       <img src="screenshots/n8n-editor-openshift-pod-monitor-mcp-granite-email.png" alt="Pod Monitor MCP + Granite + Email">
-      <div class="caption">Pod Monitor - MCP + Granite + Email</div>
+      <div class="caption">2. Pod Monitor - MCP + Granite + Email</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-deployment-rollout-status.png" alt="Deployment Rollout Status">
+      <div class="caption">3. Deployment Rollout Status</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-resource-quota-monitor.png" alt="Resource Quota Monitor">
+      <div class="caption">4. Resource Quota Monitor</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-security-audit.png" alt="Security Audit">
+      <div class="caption">5. Security Audit</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-route-tls-expiry.png" alt="Route TLS Expiry Check">
+      <div class="caption">6. Route &amp; TLS Expiry Check</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-editor-event-anomaly-detector.png" alt="Event Anomaly Detector">
+      <div class="caption">7. Event Anomaly Detector</div>
     </div>
     <div class="screenshot-card">
       <img src="screenshots/n8n-editor-smtp-test-gmail.png" alt="SMTP Test Workflow">
@@ -357,12 +403,8 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     </div>
   </div>
 
-  <h3>Dashboard &amp; Services</h3>
+  <h3>Services</h3>
   <div class="screenshot-grid">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-openshift-mcp-workflow-list.png" alt="n8n Workflow List">
-      <div class="caption">n8n Workflow List - OpenShift MCP Workflows</div>
-    </div>
     <div class="screenshot-card">
       <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
       <div class="caption">n8n Dashboard Overview</div>
