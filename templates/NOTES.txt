@@ -1,22 +1,74 @@
-1. Get the application URL by running these commands:
-{{- if .Values.ingress.enabled }}
-{{- range $host := .Values.ingress.hosts }}
-  {{- range .paths }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}
+
+==========================================================
+  n8n {{ .Chart.AppVersion }} — Workflow Automation Engine
+  Chart Version: {{ .Chart.Version }}
+==========================================================
+
+{{- if .Values.route.enabled }}
+
+  OpenShift Routes:
+
+  To get the Route URLs run:
+    oc get routes -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+  {{- if .Values.mailpit.enabled }}
+  Expected Routes:
+    - {{ include "n8n.fullname" . }}          (n8n Editor)
+    - {{ include "n8n.fullname" . }}-mailpit   (Mailpit UI)
   {{- end }}
+
+{{- else if .Values.ingress.enabled }}
+
+  Ingress URLs:
+  {{- range $host := .Values.ingress.hosts }}
+    {{- range .paths }}
+    http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+    {{- end }}
+  {{- end }}
+
+{{- else }}
+
+  Access n8n via port-forward:
+    kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "n8n.fullname" . }} 5678:{{ .Values.main.service.port | default 5678 }}
+    Open: http://localhost:5678
+
+  {{- if .Values.mailpit.enabled }}
+  Access Mailpit via port-forward:
+    kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "n8n.fullname" . }}-mailpit 8025:{{ .Values.mailpit.ui.port | default 8025 }}
+    Open: http://localhost:8025
+  {{- end }}
+
 {{- end }}
-{{- else if contains "NodePort" (default "ClusterIP" .Values.main.service.type) }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "n8n.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" (default "ClusterIP" .Values.main.service.type) }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "n8n.fullname" . }}'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "n8n.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.main.service.port }}
-{{- else if contains "ClusterIP" (default "ClusterIP" .Values.main.service.type) }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "n8n.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+  Components deployed:
+    - n8n ({{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }})
+{{- if .Values.mailpit.enabled }}
+    - Mailpit SMTP test server ({{ .Values.mailpit.image.repository }}:{{ .Values.mailpit.image.tag }})
 {{- end }}
+{{- if and .Values.workflows .Values.workflows.autoImport .Values.workflows.autoImport.enabled }}
+    - Workflow auto-import ({{ len .Values.workflows.autoImport.urls }} workflows)
+{{- end }}
+
+{{- if and .Values.workflows .Values.workflows.autoImport .Values.workflows.autoImport.enabled }}
+
+  Workflow Auto-Import:
+    {{ len .Values.workflows.autoImport.urls }} workflows will be imported from n8n-sandbox.
+    Check import status: kubectl get job -n {{ .Release.Namespace }} -l app.kubernetes.io/component=workflow-import
+{{- end }}
+
+{{- if .Values.mailpit.enabled }}
+
+  Mailpit SMTP Configuration (for n8n workflows):
+    Host: {{ include "n8n.fullname" . }}-mailpit
+    Port: {{ .Values.mailpit.smtp.port | default 1025 }}
+    SSL:  false
+{{- end }}
+
+  Documentation:
+    https://maximilianopizarro.github.io/n8n-helm-chart/
+    https://github.com/maximilianoPizarro/n8n-helm-chart
+
+  Red Hat UBI image (alternative):
+    quay.io/maximilianopizarro/n8n:{{ .Chart.AppVersion }}
+
+==========================================================
