@@ -19,6 +19,10 @@ entries:
           description: "Add Chart Verifier GitHub Actions workflow for Red Hat Community certification"
         - kind: added
           description: "Add configurable volume mount path (main.persistence.mountPath) for restricted environments"
+        - kind: added
+          description: "Add image.variant option (official/ubi) for selecting between Alpine wget and UBI curl in workflow auto-import initContainers"
+        - kind: added
+          description: "Add AI Format & Explain pipeline step to all 7 MCP workflows via LiteLLM/Granite with health assessments"
         - kind: changed
           description: "Update n8n app version to 1.123.28"
         - kind: changed
@@ -55,7 +59,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.123.28
-    created: "2026-04-06T09:40:25.7232342-03:00"
+    created: "2026-04-06T11:08:22.657901-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -65,7 +69,7 @@ entries:
       a fair-code workflow automation platform with native AI capabilities for technical
       teams. Easily automate tasks across different services. Includes optional Mailpit
       for email testing and OpenShift Developer Sandbox support.
-    digest: 5686176e7a5c3bc84bbfebbce90c4f195411aa174d7513cf569a15944d87a041
+    digest: 7454754be38c7eeeba955be88d1169898a428d8098fc4f7294dac9101619e720
     home: https://maximilianopizarro.github.io/n8n-helm-chart/
     icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
     keywords:
@@ -104,7 +108,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2026-04-06T09:40:25.7092452-03:00"
+    created: "2026-04-06T11:08:22.6443636-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -140,4 +144,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2026-04-06T09:40:25.6894943-03:00"
+generated: "2026-04-06T11:08:22.6306271-03:00"

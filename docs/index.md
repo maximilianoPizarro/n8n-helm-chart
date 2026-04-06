@@ -416,7 +416,7 @@ graph LR
   <h3>All Workflows</h3>
   <div class="screenshot-grid" style="grid-template-columns: 1fr;">
     <div class="screenshot-card">
-      <img src="screenshots/n8n-all-workflows-list.png" alt="All 8 OpenShift MCP Workflows">
+      <img src="screenshots/n8n-all-workflows-list.png" alt="All 7 OpenShift MCP Workflows">
       <div class="caption">n8n - 8 OpenShift MCP Server Workflows Imported</div>
     </div>
   </div>
@@ -518,13 +518,14 @@ graph LR
 <div class="section">
   <h2>Developer Sandbox Quick Start</h2>
   <p>For Red Hat OpenShift Developer Sandbox, use these values to ensure compatibility with restricted SCCs:</p>
-  <div class="code-block">enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
+  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "1.123.28"<br>&nbsp;&nbsp;variant: "ubi"<br><br>enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
 
   <table class="styled-table">
     <thead>
       <tr><th>Setting</th><th>Value</th><th>Reason</th></tr>
     </thead>
     <tbody>
+      <tr><td><code>image.variant</code></td><td><code>ubi</code></td><td>Uses Red Hat UBI image with <code>curl</code> for workflow downloads</td></tr>
       <tr><td><code>enableServiceLinks</code></td><td><code>false</code></td><td>Avoids N8N_PORT env conflict in OpenShift</td></tr>
       <tr><td><code>route.sccRoleDisabled</code></td><td><code>true</code></td><td>Developer Sandbox users cannot create SCC Roles</td></tr>
       <tr><td><code>main.config.n8n.user_folder</code></td><td><code>/data</code></td><td>Writable path for random UID assigned by OpenShift</td></tr>

@@ -99,9 +99,65 @@ helm install openshift-mcp-server openshift-mcp/openshift-mcp-server
 
 Full documentation: [maximilianopizarro.github.io/openshift-mcp-server](https://maximilianopizarro.github.io/openshift-mcp-server)
 
+## MCP Workflow Pipeline
+
+Each of the 7 included workflows follows a **5-node pipeline** with MCP Streamable HTTP protocol, AI-powered analysis, and email reporting:
+
+```
+Manual Trigger → Set Parameters → MCP Tool Call → AI Format & Explain → Build Report & Send Email
+```
+
+| # | Workflow | MCP Tool | MCP Server | AI Model | Protocol |
+|---|----------|----------|------------|----------|----------|
+| 1 | Deployment Monitor | `monitorDeployments` | Quarkus MCP (8080) | Granite (LiteLLM) | Streamable HTTP |
+| 2 | Pod Status | `pods_list_in_namespace` | K8s MCP (8085) | Granite (LiteLLM) | Streamable HTTP + SSE |
+| 3 | Pod Disruption Analyzer | `analyzePodDisruptions` | Quarkus MCP (8080) | Granite (LiteLLM) | Streamable HTTP |
+| 4 | Event Monitor | `events_list` | K8s MCP (8085) | Granite (LiteLLM) | Streamable HTTP + SSE |
+| 5 | Route Monitor | `resources_list` (Route) | K8s MCP (8085) | Granite (LiteLLM) | Streamable HTTP + SSE |
+| 6 | Performance Metrics | `getPerformanceMetrics` | Quarkus MCP (8080) | Granite (LiteLLM) | Streamable HTTP |
+| 7 | Helm Releases | `helm_list` | K8s MCP (8085) | Granite (LiteLLM) | Streamable HTTP + SSE |
+
+The **AI Format & Explain** node calls LiteLLM/Granite to analyze the raw MCP output and produce an HTML summary with health assessments. The **Build Report & Send Email** node generates a branded HTML email containing both the AI analysis and the raw MCP data, then sends it via Mailpit.
+
+## Workflow Auto-Import
+
+Workflows can be automatically downloaded and imported into n8n at startup using initContainers:
+
+```yaml
+workflows:
+  autoImport:
+    enabled: true
+    urls:
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-agent.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-granite.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-deployment-rollout-status.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-resource-quota-monitor.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-security-audit.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-route-tls-expiry.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-event-anomaly-detector.json
+```
+
+The download tool is selected automatically based on `image.variant`: `wget` for the official Alpine image, `curl` for the Red Hat UBI image.
+
 ## Container Image (Podman / Docker)
 
 A Red Hat UBI 9-based container image is available at `quay.io/maximilianopizarro/n8n`. It uses a 3-stage build: extracts n8n from Docker Hub, rebuilds sqlite3 for Node.js 22 + glibc in `ubi9/nodejs-22`, and packages on `ubi9/nodejs-22-minimal`.
+
+### Image Variant Selection
+
+The chart supports two image variants via `image.variant` in `values.yaml`:
+
+| Variant | Image | Download Tool | Use Case |
+|---------|-------|---------------|----------|
+| `official` (default) | `n8nio/n8n` | `wget` | Standard Alpine-based image from Docker Hub |
+| `ubi` | `quay.io/maximilianopizarro/n8n` | `curl` | Red Hat UBI 9 for OpenShift / enterprise environments |
+
+```yaml
+image:
+  repository: quay.io/maximilianopizarro/n8n
+  tag: "1.123.28"
+  variant: "ubi"
+```
 
 ### Run from Quay.io
 

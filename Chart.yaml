@@ -56,6 +56,10 @@ annotations:
       description: "Add Chart Verifier GitHub Actions workflow for Red Hat Community certification"
     - kind: added
       description: "Add configurable volume mount path (main.persistence.mountPath) for restricted environments"
+    - kind: added
+      description: "Add image.variant option (official/ubi) for selecting between Alpine wget and UBI curl in workflow auto-import initContainers"
+    - kind: added
+      description: "Add AI Format & Explain pipeline step to all 7 MCP workflows via LiteLLM/Granite with health assessments"
     - kind: changed
       description: "Update n8n app version to 1.123.28"
     - kind: changed
