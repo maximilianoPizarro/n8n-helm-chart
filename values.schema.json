@@ -1109,7 +1109,7 @@
           "type": "array"
         },
         "extraEnvVars": {
-          "additionalProperties": false,
+          "additionalProperties": true,
           "description": "Extra environment variables",
           "properties": {
             "N8N_LISTEN_ADDRESS": {

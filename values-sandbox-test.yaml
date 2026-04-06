@@ -1,3 +1,8 @@
+image:
+  repository: n8nio/n8n
+  pullPolicy: IfNotPresent
+  tag: ""
+
 enableServiceLinks: false
 
 podSecurityContext: {}
@@ -19,6 +24,10 @@ route:
   host: ""
 
 main:
+  extraEnvVars:
+    N8N_LISTEN_ADDRESS: "0.0.0.0"
+    NODE_FUNCTION_ALLOW_BUILTIN: "*"
+    NODE_FUNCTION_ALLOW_EXTERNAL: "*"
   config:
     n8n:
       editor_base_url: ""

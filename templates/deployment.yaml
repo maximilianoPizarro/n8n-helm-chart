@@ -51,8 +51,54 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.main.podSecurityContext | nindent 8 }}
-      {{- if or .Values.main.initContainers }}
+      {{- if or .Values.main.initContainers (and .Values.workflows .Values.workflows.autoImport .Values.workflows.autoImport.enabled) }}
       initContainers:
+      {{- if and .Values.workflows .Values.workflows.autoImport .Values.workflows.autoImport.enabled }}
+        - name: download-workflows
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.main.securityContext | nindent 12 }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              mkdir -p /tmp/workflows
+              {{- range .Values.workflows.autoImport.urls }}
+              echo "Downloading {{ . }}"
+              wget -q -O "/tmp/workflows/$(basename {{ . }})" "{{ . }}" || echo "Failed: {{ . }}"
+              {{- end }}
+              echo "Downloaded $(ls /tmp/workflows/*.json 2>/dev/null | wc -l) workflows"
+          volumeMounts:
+            - name: workflow-data
+              mountPath: /tmp/workflows
+        - name: import-workflows
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.main.securityContext | nindent 12 }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              if [ "$(ls -A /tmp/workflows/*.json 2>/dev/null)" ]; then
+                n8n import:workflow --separate --input=/tmp/workflows/ 2>&1 || true
+                echo "Imported workflows successfully"
+              else
+                echo "No workflow files found"
+              fi
+          envFrom:
+            {{- if .Values.main.config }}
+            - configMapRef:
+                name: {{ include "n8n.fullname" . }}-app-config
+            {{- end }}
+          env:
+            {{- range $key, $value := .Values.main.extraEnvVars }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: workflow-data
+              mountPath: /tmp/workflows
+            - name: data
+              mountPath: {{ .Values.main.persistence.mountPath | default "/home/node/.n8n" }}
+      {{- end }}
       {{- if .Values.main.initContainers }}
         {{ tpl (toYaml .Values.main.initContainers) . | nindent 10 }}
       {{- end }}
@@ -76,7 +122,11 @@ spec:
             - secretRef:
                 name: {{ include "n8n.fullname" . }}-app-secret
             {{- end }}
-          env: {{ not (empty .Values.main.extraEnv) | ternary nil "[]" }}
+          env:
+            {{- range $key, $value := .Values.main.extraEnvVars }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
             {{- range $key, $value := .Values.main.extraEnv }}
             - name: {{ $key }}
               {{- toYaml $value | nindent 14 }}
@@ -122,6 +172,10 @@ spec:
       volumes:
         - name: "data"
           {{ include "n8n.pvc" . }}
+        {{- if and .Values.workflows .Values.workflows.autoImport .Values.workflows.autoImport.enabled }}
+        - name: workflow-data
+          emptyDir: {}
+        {{- end }}
         {{- if .Values.main.extraVolumes }}
           {{- toYaml .Values.main.extraVolumes | nindent 8 }}
         {{- end }}
