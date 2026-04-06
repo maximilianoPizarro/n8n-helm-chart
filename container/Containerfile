@@ -1,9 +1,21 @@
-# Source image from Docker Hub: n8nio/n8n:<appVersion>
-# This is the same image referenced in values.yaml image.repository/tag
 ARG N8N_VERSION=1.123.28
+
+# Stage 1: Source - extract n8n from official Docker Hub image
 FROM docker.io/n8nio/n8n:${N8N_VERSION} AS source
 
-# Red Hat UBI 9 certified base image with Node.js 22
+# Stage 2: Builder - rebuild sqlite3 native module for Node.js 22 + glibc (RHEL)
+FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS builder
+
+USER 0
+
+COPY --from=source /usr/local/lib/node_modules /usr/local/lib/node_modules
+
+WORKDIR /usr/local/lib/node_modules/n8n/node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3
+RUN rm -rf build prebuilds && \
+    ./node_modules/.bin/prebuild-install -r napi || \
+    (echo "prebuild-install failed, falling back to node-gyp" && npx --yes node-gyp rebuild)
+
+# Stage 3: Runtime - minimal UBI image
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
 
 ARG N8N_VERSION=1.123.28
@@ -29,8 +41,8 @@ RUN microdnf install -y shadow-utils && \
     chown -R 1000:0 /home/node /data && \
     chmod -R g=u /home/node /data
 
-COPY --from=source --chown=1000:0 /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=source --chown=1000:0 /usr/local/bin/n8n /usr/local/bin/n8n
+COPY --from=builder --chown=1000:0 /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n
 
 ENV N8N_USER_FOLDER=/data \
     N8N_PORT=5678 \

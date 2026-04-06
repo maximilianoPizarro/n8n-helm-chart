@@ -1,5 +1,5 @@
 image:
-  repository: n8nio/n8n
+  repository: quay.io/maximilianopizarro/n8n
   pullPolicy: IfNotPresent
   tag: ""
 
