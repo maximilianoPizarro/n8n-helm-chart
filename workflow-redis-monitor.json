@@ -7,24 +7,14 @@
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [220, 300]
+      "position": [180, 300]
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            {
-              "id": "namespace-param",
-              "name": "namespace",
-              "value": "maximilianopizarro5-dev",
-              "type": "string"
-            },
-            {
-              "id": "email-param",
-              "name": "destinationEmail",
-              "value": "maximiliano.pizarro.5@gmail.com",
-              "type": "string"
-            }
+            {"id": "ns", "name": "namespace", "value": "maximilianopizarro5-dev", "type": "string"},
+            {"id": "email", "name": "destinationEmail", "value": "maximiliano.pizarro.5@gmail.com", "type": "string"}
           ]
         },
         "options": {}
@@ -33,7 +23,17 @@
       "name": "Set Parameters",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [440, 300]
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst token = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token', 'utf8').trim();\nreturn [{ json: { ...($input.first().json), saToken: token } }];"
+      },
+      "id": "read-token",
+      "name": "Read SA Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 300]
     },
     {
       "parameters": {
@@ -42,113 +42,37 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ require('fs').readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token', 'utf8') }}"
-            }
+            {"name": "Authorization", "value": "=Bearer {{ $json.saToken }}"}
           ]
         },
         "options": {
           "allowUnauthorizedCerts": true,
           "timeout": 15000,
-          "response": {
-            "response": {
-              "fullResponse": false,
-              "responseFormat": "json"
-            }
-          }
+          "response": {"response": {"fullResponse": false, "responseFormat": "json"}}
         }
       },
       "id": "get-redis-pods",
       "name": "Get Redis Pods",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300]
+      "position": [840, 300]
     },
     {
       "parameters": {
-        "jsCode": "const pods = $input.first().json;\nconst namespace = $('Set Parameters').first().json.namespace;\nconst email = $('Set Parameters').first().json.destinationEmail;\n\nconst podList = pods.items || [];\nconst ts = new Date().toISOString();\n\nlet rows = '';\nlet allHealthy = true;\n\nfor (const pod of podList) {\n  const name = pod.metadata.name;\n  const phase = pod.status.phase;\n  const ready = pod.status.containerStatuses?.[0]?.ready ? 'Yes' : 'No';\n  const restarts = pod.status.containerStatuses?.[0]?.restartCount || 0;\n  const image = pod.spec.containers?.[0]?.image || 'unknown';\n  const version = image.split(':')[1] || 'latest';\n  const statusColor = phase === 'Running' ? '#92D400' : '#F0AB00';\n  if (phase !== 'Running') allHealthy = false;\n  rows += `<tr><td style='padding:10px;border-bottom:1px solid #E0E0E0;'>${name}</td><td style='padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;'><span style='background:${statusColor};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;'>${phase}</span></td><td style='padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;'>${ready}</td><td style='padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;'>${restarts}</td><td style='padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;'>${version}</td></tr>`;\n}\n\nconst healthStatus = allHealthy && podList.length > 0 ? 'healthy' : 'degraded';\nconst healthColor = healthStatus === 'healthy' ? '#92D400' : '#F0AB00';\nconst healthBg = healthStatus === 'healthy' ? '#F0FFF0' : '#FFFBF0';\n\nreturn [{\n  json: {\n    podCount: podList.length,\n    tableRows: rows,\n    healthStatus,\n    healthColor,\n    healthBg,\n    namespace,\n    destinationEmail: email,\n    timestamp: ts\n  }\n}];"
+        "jsCode": "const http = require('http');\nconst pods = $input.first().json;\nconst namespace = $('Set Parameters').first().json.namespace;\nconst email = $('Set Parameters').first().json.destinationEmail;\nconst podList = pods.items || [];\nconst ts = new Date().toISOString();\n\nlet rows = '';\nlet allHealthy = true;\n\nfor (const pod of podList) {\n  const name = pod.metadata.name;\n  const phase = pod.status.phase;\n  const ready = pod.status.containerStatuses?.[0]?.ready ? 'Yes' : 'No';\n  const restarts = pod.status.containerStatuses?.[0]?.restartCount || 0;\n  const image = pod.spec.containers?.[0]?.image || 'unknown';\n  const version = image.split(':')[1] || 'latest';\n  const statusColor = phase === 'Running' ? '#92D400' : '#F0AB00';\n  if (phase !== 'Running') allHealthy = false;\n  rows += '<tr><td style=\"padding:10px;border-bottom:1px solid #E0E0E0;\">' + name + '</td><td style=\"padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;\"><span style=\"background:' + statusColor + ';padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;\">' + phase + '</span></td><td style=\"padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;\">' + ready + '</td><td style=\"padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;\">' + restarts + '</td><td style=\"padding:10px;text-align:center;border-bottom:1px solid #E0E0E0;\">' + version + '</td></tr>';\n}\n\nconst healthStatus = allHealthy && podList.length > 0 ? 'HEALTHY' : 'DEGRADED';\nconst healthColor = healthStatus === 'HEALTHY' ? '#92D400' : '#F0AB00';\nconst healthBg = healthStatus === 'HEALTHY' ? '#F0FFF0' : '#FFFBF0';\nconst subject = '[Red Hat OpenShift] Redis Health Report | ' + namespace + ' | ' + ts;\n\nconst html = '<html><body style=\"margin:0;padding:0;background:#f0f0f0;font-family:Red Hat Display,Arial,sans-serif;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#f0f0f0;\"><tr><td align=\"center\" style=\"padding:24px;\"><table width=\"640\" style=\"max-width:640px;width:100%;\"><tr><td style=\"background:#151515;padding:16px 32px;border-radius:8px 8px 0 0;\"><span style=\"color:#EE0000;font-size:20px;font-weight:700;\">Red Hat</span><span style=\"float:right;color:#C6C6C6;font-size:12px;line-height:28px;\">OpenShift Developer Sandbox</span></td></tr><tr><td style=\"background:#DC382D;padding:28px 32px;\"><h1 style=\"margin:0;font-size:24px;color:#FFF;\">Redis Health Report</h1><p style=\"margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);\">Automated Redis deployment monitoring on OpenShift</p></td></tr><tr><td style=\"background:#292929;padding:0;\"><table width=\"100%\"><tr><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:33%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">' + namespace + '</b>Namespace</td><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:34%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">' + ts + '</b>Generated</td><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;width:33%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">' + podList.length + ' Pod(s)</b>Redis</td></tr></table></td></tr><tr><td style=\"background:#FFF;padding:28px 32px;\"><h2 style=\"margin:0 0 16px;font-size:17px;border-bottom:2px solid #DC382D;padding-bottom:10px;\">Redis Deployment Status</h2><table style=\"width:100%;border-collapse:collapse;font-size:13px;\"><tr style=\"background:#F5F5F5;\"><th style=\"padding:10px;text-align:left;border-bottom:2px solid #DC382D;\">Pod</th><th style=\"padding:10px;text-align:center;border-bottom:2px solid #DC382D;\">Status</th><th style=\"padding:10px;text-align:center;border-bottom:2px solid #DC382D;\">Ready</th><th style=\"padding:10px;text-align:center;border-bottom:2px solid #DC382D;\">Restarts</th><th style=\"padding:10px;text-align:center;border-bottom:2px solid #DC382D;\">Version</th></tr>' + rows + '</table><div style=\"margin-top:20px;padding:14px;background:' + healthBg + ';border-left:4px solid ' + healthColor + ';border-radius:4px;\"><strong>Overall Status: ' + healthStatus + '</strong><p style=\"margin:6px 0 0;font-size:13px;color:#333;\">' + podList.length + ' Redis pod(s) monitored in namespace ' + namespace + '.</p></div></td></tr><tr><td style=\"background:#F5F5F5;padding:16px 32px;border-top:1px solid #E0E0E0;text-align:center;\"><span style=\"display:inline-block;background:#EE0000;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px;\">RED HAT</span> <span style=\"font-size:11px;color:#6A6E73;margin:0 8px;\">OpenShift</span> <span style=\"font-size:11px;color:#DC382D;font-weight:600;margin:0 8px;\">Redis</span> <span style=\"font-size:11px;color:#6A6E73;margin:0 8px;\">n8n</span></td></tr><tr><td style=\"background:#151515;padding:20px 32px;border-radius:0 0 8px 8px;text-align:center;\"><p style=\"margin:0;font-size:12px;color:#A3A3A3;\">Auto-generated by n8n on <b style=\"color:#FFF;\">Red Hat OpenShift Developer Sandbox</b></p></td></tr></table></td></tr></table></body></html>';\n\nconst mailBody = JSON.stringify({\n  From: { Name: 'n8n Redis Monitor', Email: 'redis-monitor@n8n.local' },\n  To: [{ Name: 'Admin', Email: email }],\n  Subject: subject,\n  HTML: html\n});\n\nreturn new Promise((resolve, reject) => {\n  const req = http.request({\n    hostname: 'n8n-mailpit',\n    port: 8025,\n    path: '/api/v1/send',\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(mailBody)\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', (chunk) => { data += chunk; });\n    res.on('end', () => {\n      resolve([{\n        json: {\n          mailpitStatus: res.statusCode,\n          mailpitResponse: data,\n          subject,\n          healthStatus,\n          podCount: podList.length,\n          namespace,\n          timestamp: ts\n        }\n      }]);\n    });\n  });\n  req.on('error', (e) => reject(new Error('Mailpit send failed: ' + e.message)));\n  req.write(mailBody);\n  req.end();\n});"
       },
-      "id": "format-report",
-      "name": "Format Redis Report",
+      "id": "build-and-send",
+      "name": "Build Report & Send Email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "http://n8n-mailpit:8025/api/v1/send",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"From\": {\"Name\": \"n8n Workflow\", \"Address\": \"no-reply@n8n.local\"},\n  \"To\": [{\"Name\": \"\", \"Address\": \"{{ $json.destinationEmail }}\"}],\n  \"Subject\": \"[Red Hat OpenShift] Redis Health Report | {{ $json.namespace }}\",\n  \"HTML\": \"<html><body style='margin:0;padding:0;background:#f0f0f0;font-family:Arial,sans-serif;'><table width='100%' cellpadding='0' cellspacing='0' style='background:#f0f0f0;'><tr><td align='center' style='padding:24px;'><table width='640' style='max-width:640px;width:100%;'><tr><td style='background:#151515;padding:16px 32px;border-radius:8px 8px 0 0;'><span style='color:#EE0000;font-size:20px;font-weight:700;'>Red Hat</span><span style='float:right;color:#C6C6C6;font-size:12px;line-height:28px;'>OpenShift Developer Sandbox</span></td></tr><tr><td style='background:#DC382D;padding:28px 32px;'><h1 style='margin:0;font-size:24px;color:#FFF;'>Redis Health Report</h1><p style='margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);'>Automated Redis deployment monitoring on OpenShift</p></td></tr><tr><td style='background:#292929;padding:0;'><table width='100%'><tr><td style='padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:33%;'><b style='display:block;color:#FFF;font-size:13px;'>{{ $json.namespace }}</b>Namespace</td><td style='padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:34%;'><b style='display:block;color:#FFF;font-size:13px;'>{{ $json.timestamp }}</b>Generated</td><td style='padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;width:33%;'><b style='display:block;color:#FFF;font-size:13px;'>{{ $json.podCount }} Pod(s)</b>Redis</td></tr></table></td></tr><tr><td style='background:#FFF;padding:28px 32px;'><h2 style='margin:0 0 16px;font-size:17px;border-bottom:2px solid #DC382D;padding-bottom:10px;'>Redis Deployment Status</h2><table style='width:100%;border-collapse:collapse;font-size:13px;'><tr style='background:#F5F5F5;'><th style='padding:10px;text-align:left;border-bottom:2px solid #DC382D;'>Pod</th><th style='padding:10px;text-align:center;border-bottom:2px solid #DC382D;'>Status</th><th style='padding:10px;text-align:center;border-bottom:2px solid #DC382D;'>Ready</th><th style='padding:10px;text-align:center;border-bottom:2px solid #DC382D;'>Restarts</th><th style='padding:10px;text-align:center;border-bottom:2px solid #DC382D;'>Version</th></tr>{{ $json.tableRows }}</table><div style='margin-top:20px;padding:14px;background:{{ $json.healthBg }};border-left:4px solid {{ $json.healthColor }};border-radius:4px;'><strong>Overall Status: {{ $json.healthStatus }}</strong><p style='margin:6px 0 0;font-size:13px;color:#333;'>{{ $json.podCount }} Redis pod(s) monitored in namespace {{ $json.namespace }}.</p></div></td></tr><tr><td style='background:#F5F5F5;padding:16px 32px;border-top:1px solid #E0E0E0;text-align:center;'><span style='display:inline-block;background:#EE0000;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px;'>RED HAT</span> <span style='font-size:11px;color:#6A6E73;margin:0 8px;'>OpenShift</span> <span style='font-size:11px;color:#DC382D;font-weight:600;margin:0 8px;'>Redis</span> <span style='font-size:11px;color:#6A6E73;margin:0 8px;'>n8n</span></td></tr><tr><td style='background:#151515;padding:20px 32px;border-radius:0 0 8px 8px;text-align:center;'><p style='margin:0;font-size:12px;color:#A3A3A3;'>Auto-generated by n8n on <b style='color:#FFF;'>Red Hat OpenShift Developer Sandbox</b></p></td></tr></table></td></tr></table></body></html>\"\n}",
-        "options": {
-          "timeout": 30000
-        }
-      },
-      "id": "send-email-mailpit",
-      "name": "Send Redis Report via Mailpit",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1100, 300]
+      "position": [1060, 300]
     }
   ],
   "connections": {
-    "Manual Trigger": {
-      "main": [
-        [
-          {
-            "node": "Set Parameters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set Parameters": {
-      "main": [
-        [
-          {
-            "node": "Get Redis Pods",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Redis Pods": {
-      "main": [
-        [
-          {
-            "node": "Format Redis Report",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Redis Report": {
-      "main": [
-        [
-          {
-            "node": "Send Redis Report via Mailpit",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Manual Trigger": {"main": [[{"node": "Set Parameters", "type": "main", "index": 0}]]},
+    "Set Parameters": {"main": [[{"node": "Read SA Token", "type": "main", "index": 0}]]},
+    "Read SA Token": {"main": [[{"node": "Get Redis Pods", "type": "main", "index": 0}]]},
+    "Get Redis Pods": {"main": [[{"node": "Build Report & Send Email", "type": "main", "index": 0}]]}
   },
-  "settings": {
-    "executionOrder": "v1"
-  }
+  "settings": {"executionOrder": "v1"}
 }

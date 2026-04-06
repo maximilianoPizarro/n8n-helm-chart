@@ -109,7 +109,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"From\": {\"Name\": \"n8n Workflow\", \"Address\": \"no-reply@n8n.local\"},\n  \"To\": [{\"Name\": \"\", \"Address\": \"{{ $json.destinationEmail }}\"}],\n  \"Subject\": \"{{ $json.subject }}\",\n  \"HTML\": {{ JSON.stringify($json.html) }}\n}",
+        "jsonBody": "={\n  \"From\": {\"Name\": \"n8n Workflow\", \"Email\": \"no-reply@n8n.local\"},\n  \"To\": [{\"Name\": \"\", \"Email\": \"{{ $json.destinationEmail }}\"}],\n  \"Subject\": \"{{ $json.subject }}\",\n  \"HTML\": {{ JSON.stringify($json.html) }}\n}",
         "options": {"timeout": 30000}
       },
       "id": "send-mailpit",
