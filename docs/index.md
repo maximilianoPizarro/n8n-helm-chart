@@ -699,9 +699,40 @@ graph LR
 
 <div class="section">
   <h2>Container Image</h2>
-  <p>A Red Hat UBI-based container image is available at <code>quay.io/maximilianopizarro/n8n</code>. It clones the official n8n source, builds it, and runs on a Red Hat certified base image (<code>registry.access.redhat.com/ubi9/nodejs-22</code>).</p>
+  <p>A Red Hat UBI 9-based container image is available at <code>quay.io/maximilianopizarro/n8n</code>. It uses a <strong>3-stage build</strong> that extracts n8n from the official Docker Hub image, rebuilds native modules (sqlite3) for Node.js 22 + glibc, and packages everything on <code>registry.access.redhat.com/ubi9/nodejs-22-minimal</code>.</p>
   <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "1.123.28"</div>
-  <p>The image is built automatically via GitHub Actions on every push to <code>main</code>.</p>
+  <p>The image is built automatically via GitHub Actions on every push to <code>main</code> and published to <a href="https://quay.io/repository/maximilianopizarro/n8n">Quay.io</a>.</p>
+
+  <h3>Build &amp; Run Locally with Podman</h3>
+  <p>You can build and test the UBI container image locally using Podman (or Docker) before deploying to a cluster:</p>
+
+  <h4>Build the image</h4>
+  <div class="code-block">podman build -t quay.io/maximilianopizarro/n8n:1.123.28 \<br>&nbsp;&nbsp;-f container/Containerfile \<br>&nbsp;&nbsp;--build-arg N8N_VERSION=1.123.28 .</div>
+
+  <h4>Run n8n</h4>
+  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:1.123.28</div>
+  <p>Open <a href="http://localhost:5678">http://localhost:5678</a> in your browser to access the n8n editor.</p>
+
+  <h4>Run with pre-built image from Quay.io</h4>
+  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:1.123.28</div>
+
+  <h4>Run with Mailpit for email testing</h4>
+  <div class="code-block"><span style="color:#6b7280;"># Start Mailpit (SMTP on 1025, Web UI on 8025)</span><br>podman run -d --name mailpit \<br>&nbsp;&nbsp;-p 8025:8025 -p 1025:1025 \<br>&nbsp;&nbsp;docker.io/axllent/mailpit:latest<br><br><span style="color:#6b7280;"># Start n8n connected to Mailpit</span><br>podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_BUILTIN="*" \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_EXTERNAL="*" \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:1.123.28</div>
+  <p>Access Mailpit at <a href="http://localhost:8025">http://localhost:8025</a> to view captured emails.</p>
+
+  <h4>Useful commands</h4>
+  <div class="code-block"><span style="color:#6b7280;"># Check n8n version</span><br>podman exec n8n n8n --version<br><br><span style="color:#6b7280;"># View logs</span><br>podman logs -f n8n<br><br><span style="color:#6b7280;"># Health check</span><br>curl http://localhost:5678/healthz<br><br><span style="color:#6b7280;"># Stop and remove</span><br>podman stop n8n &amp;&amp; podman rm n8n</div>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Build Stage</th><th>Base Image</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1. Source</td><td><code>n8nio/n8n:1.123.28</code></td><td>Extract n8n node_modules</td></tr>
+      <tr><td>2. Builder</td><td><code>ubi9/nodejs-22</code></td><td>Rebuild sqlite3 native module for Node.js 22 + glibc</td></tr>
+      <tr><td>3. Runtime</td><td><code>ubi9/nodejs-22-minimal</code></td><td>Minimal production image (~350MB)</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="section">

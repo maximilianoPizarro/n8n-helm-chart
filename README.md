@@ -98,6 +98,63 @@ helm install openshift-mcp-server openshift-mcp/openshift-mcp-server
 
 Full documentation: [maximilianopizarro.github.io/openshift-mcp-server](https://maximilianopizarro.github.io/openshift-mcp-server)
 
+## Container Image (Podman / Docker)
+
+A Red Hat UBI 9-based container image is available at `quay.io/maximilianopizarro/n8n`. It uses a 3-stage build: extracts n8n from Docker Hub, rebuilds sqlite3 for Node.js 22 + glibc in `ubi9/nodejs-22`, and packages on `ubi9/nodejs-22-minimal`.
+
+### Run from Quay.io
+
+```shell
+podman run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n-data:/data \
+  quay.io/maximilianopizarro/n8n:1.123.28
+```
+
+Open [http://localhost:5678](http://localhost:5678) to access the n8n editor.
+
+### Build locally
+
+```shell
+podman build -t quay.io/maximilianopizarro/n8n:1.123.28 \
+  -f container/Containerfile \
+  --build-arg N8N_VERSION=1.123.28 .
+```
+
+### Run with Mailpit for email testing
+
+```shell
+# Start Mailpit (SMTP on 1025, Web UI on 8025)
+podman run -d --name mailpit \
+  -p 8025:8025 -p 1025:1025 \
+  docker.io/axllent/mailpit:latest
+
+# Start n8n with MCP Code node support
+podman run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n-data:/data \
+  -e NODE_FUNCTION_ALLOW_BUILTIN="*" \
+  -e NODE_FUNCTION_ALLOW_EXTERNAL="*" \
+  quay.io/maximilianopizarro/n8n:1.123.28
+```
+
+Access Mailpit at [http://localhost:8025](http://localhost:8025).
+
+### Useful commands
+
+```shell
+podman exec n8n n8n --version    # Check version
+podman logs -f n8n               # View logs
+curl http://localhost:5678/healthz   # Health check
+podman stop n8n && podman rm n8n     # Stop and remove
+```
+
+| Build Stage | Base Image | Purpose |
+|-------------|-----------|---------|
+| 1. Source | `n8nio/n8n:1.123.28` | Extract n8n node_modules |
+| 2. Builder | `ubi9/nodejs-22` | Rebuild sqlite3 native module for Node.js 22 + glibc |
+| 3. Runtime | `ubi9/nodejs-22-minimal` | Minimal production image |
+
 # Examples
 
 A typical example of a config in combination with a secret.
