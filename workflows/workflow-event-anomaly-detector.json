@@ -1,24 +1,51 @@
 {
-  "name": "OpenShift Event Anomaly Detector",
+  "name": "OpenShift Event Monitor - MCP",
   "nodes": [
     {
-      "parameters": {"rule": {"interval": [{"field": "minutes", "minutesInterval": 30}]}},
-      "id": "trigger-schedule",
-      "name": "Every 30 Minutes",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [180, 300]
+      "parameters": {},
+      "id": "trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        300
+      ]
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            {"id": "ns", "name": "namespace", "value": "maximilianopizarro5-dev", "type": "string"},
-            {"id": "email", "name": "destinationEmail", "value": "maximiliano.pizarro.5@gmail.com", "type": "string"},
-            {"id": "mcp-url", "name": "mcpServerUrl", "value": "http://openshift-mcp-server-k8s-mcp.maximilianopizarro5-dev.svc.cluster.local:8085/mcp", "type": "string"},
-            {"id": "litellm-url", "name": "litellmUrl", "value": "http://openshift-mcp-server-litellm.maximilianopizarro5-dev.svc.cluster.local:4000", "type": "string"},
-            {"id": "litellm-key", "name": "litellmApiKey", "value": "sk-openshift-mcp-1234", "type": "string"},
-            {"id": "model", "name": "modelName", "value": "granite", "type": "string"}
+            {
+              "id": "ns",
+              "name": "namespace",
+              "value": "maximilianopizarro5-dev",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "destinationEmail",
+              "value": "maximiliano.pizarro.5@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "mcpHost",
+              "name": "mcpHost",
+              "value": "openshift-mcp-server-k8s-mcp.maximilianopizarro5-dev.svc.cluster.local",
+              "type": "string"
+            },
+            {
+              "id": "mcpPort",
+              "name": "mcpPort",
+              "value": "8085",
+              "type": "string"
+            },
+            {
+              "id": "tool",
+              "name": "toolName",
+              "value": "events_list",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -27,123 +54,76 @@
       "name": "Set Parameters",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [400, 300]
+      "position": [
+        400,
+        300
+      ]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "={{ $json.mcpServerUrl }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {"name": "Content-Type", "value": "application/json"},
-            {"name": "Accept", "value": "application/json, text/event-stream"}
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"events_list\",\n    \"arguments\": {\n      \"namespace\": \"{{ $json.namespace }}\"\n    }\n  }\n}",
-        "options": {
-          "timeout": 30000,
-          "response": {"response": {"fullResponse": false, "responseFormat": "json"}}
-        }
+        "jsCode": "const http = require('http');\n\nfunction mcpRequest(host, port, body, sessionId) {\n  return new Promise((resolve, reject) => {\n    const data = JSON.stringify(body);\n    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream', 'Content-Length': Buffer.byteLength(data) };\n    if (sessionId) headers['Mcp-Session-Id'] = sessionId;\n    const req = http.request({ hostname: host, port, path: '/mcp', method: 'POST', headers }, (res) => {\n      let body = '';\n      res.on('data', (chunk) => body += chunk);\n      res.on('end', () => {\n        const lines = body.split('\\n');\n        let jsonData = '';\n        for (const line of lines) { if (line.startsWith('data: ')) jsonData = line.substring(6); }\n        resolve({ status: res.statusCode, headers: res.headers, body: jsonData || body });\n      });\n    });\n    req.on('error', reject);\n    req.write(data);\n    req.end();\n  });\n}\n\nasync function callMcpTool(host, port, toolName, toolArgs) {\n  const init = await mcpRequest(host, port, { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'n8n-workflow', version: '1.0' } } });\n  const sid = init.headers['mcp-session-id'];\n  await mcpRequest(host, port, { jsonrpc: '2.0', method: 'notifications/initialized' }, sid);\n  const result = await mcpRequest(host, port, { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: toolName, arguments: toolArgs } }, sid);\n  const parsed = JSON.parse(result.body);\n  return parsed.result?.content?.[0]?.text || 'Error: ' + JSON.stringify(parsed.error);\n}\n\nconst j = $input.first().json;\nconst host = j.mcpHost;\nconst port = parseInt(j.mcpPort, 10);\nconst mcpOutput = await callMcpTool(host, port, j.toolName, { namespace: j.namespace });\nreturn [{ json: { ...j, mcpOutput } }];\n"
       },
-      "id": "mcp-events",
-      "name": "MCP: events_list",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [620, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $('Set Parameters').item.json.litellmUrl }}/v1/chat/completions",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {"name": "Authorization", "value": "=Bearer {{ $('Set Parameters').item.json.litellmApiKey }}"},
-            {"name": "Content-Type", "value": "application/json"}
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"{{ $('Set Parameters').item.json.modelName }}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an OpenShift SRE specialist. Analyze Kubernetes events from MCP Server and detect anomalies. Identify repeated warnings, OOMKilled, FailedScheduling, image pull errors, and other critical patterns. Provide root cause analysis and remediation steps. Classify anomaly severity. Format as HTML with color-coded rows. If no anomalies found, report the namespace as healthy.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"The following event data was retrieved via the Kubernetes MCP Server (events_list tool) for namespace '{{ $('Set Parameters').item.json.namespace }}':\\n\\n{{ JSON.stringify($json) }}\\n\\nAnalyze for anomalies: 1) Warning/Error events 2) Repeated events (count > 3) 3) FailedScheduling, BackOff, Unhealthy, FailedCreate patterns 4) OOMKilled or eviction events 5) Image pull errors. For each anomaly provide: event type, involved object, message, count, and recommended action. End with a summary indicating whether alerts should be sent.\"\n    }\n  ],\n  \"max_tokens\": 4096,\n  \"temperature\": 0.1\n}",
-        "options": {
-          "timeout": 120000,
-          "response": {"response": {"fullResponse": false, "responseFormat": "json"}}
-        }
-      },
-      "id": "ai-analysis",
-      "name": "AI: Event Analysis",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [840, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "const aiReport = $input.first().json.choices[0].message.content;\nconst params = $('Set Parameters').first().json;\nconst model = $input.first().json.model || params.modelName;\nconst ts = new Date().toISOString();\nconst lc = aiReport.toLowerCase();\nconst hasAnomalies = lc.includes('warning') || lc.includes('critical') || lc.includes('error') || lc.includes('anomal');\n\nconst html = `<html><body style=\"margin:0;padding:0;background:#f0f0f0;font-family:Red Hat Display,Arial,sans-serif;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#f0f0f0;\"><tr><td align=\"center\" style=\"padding:24px;\"><table width=\"640\" style=\"max-width:640px;width:100%;\"><tr><td style=\"background:#151515;padding:16px 32px;border-radius:8px 8px 0 0;\"><span style=\"color:#EE0000;font-size:20px;font-weight:700;\">Red Hat</span><span style=\"float:right;color:#C6C6C6;font-size:12px;line-height:28px;\">OpenShift Developer Sandbox</span></td></tr><tr><td style=\"background:${hasAnomalies ? '#A30000' : '#DC382D'};padding:28px 32px;\"><h1 style=\"margin:0;font-size:24px;color:#FFF;\">${hasAnomalies ? 'Event Anomaly Alert' : 'Event Status Report'}</h1><p style=\"margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);\">MCP Tool: events_list | Model: ${model}</p></td></tr><tr><td style=\"background:#292929;padding:0;\"><table width=\"100%\"><tr><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:25%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">${params.namespace}</b>Namespace</td><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:25%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">${ts}</b>Generated</td><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:25%;\"><b style=\"display:block;color:#FFF;font-size:13px;\">${model}</b>AI Model</td><td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;width:25%;\"><b style=\"display:block;color:${hasAnomalies ? '#F0AB00' : '#92D400'};font-size:13px;\">${hasAnomalies ? 'ANOMALIES' : 'HEALTHY'}</b>Status</td></tr></table></td></tr><tr><td style=\"background:#FFF;padding:28px 32px;\"><h2 style=\"margin:0 0 16px;font-size:17px;border-bottom:2px solid #DC382D;padding-bottom:10px;\">Event Anomaly Report</h2><p style=\"font-size:11px;color:#6A6E73;margin:0 0 16px;\">Pipeline: K8s MCP Server (events_list) → AI Analysis → Mailpit</p>${aiReport}</td></tr><tr><td style=\"background:#F5F5F5;padding:16px 32px;border-top:1px solid #E0E0E0;text-align:center;\"><span style=\"display:inline-block;background:#EE0000;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px;\">RED HAT</span> <span style=\"font-size:11px;color:#6A6E73;margin:0 8px;\">OpenShift MCP</span> <span style=\"font-size:11px;color:#DC382D;font-weight:600;margin:0 8px;\">${model}</span> <span style=\"font-size:11px;color:#6A6E73;margin:0 8px;\">n8n</span></td></tr><tr><td style=\"background:#151515;padding:20px 32px;border-radius:0 0 8px 8px;text-align:center;\"><p style=\"margin:0;font-size:12px;color:#A3A3A3;\">Auto-generated by n8n on <b style=\"color:#FFF;\">Red Hat OpenShift Developer Sandbox</b></p></td></tr></table></td></tr></table></body></html>`;\n\nreturn [{json: {html, subject: `[Red Hat OpenShift] ${hasAnomalies ? 'Event Anomaly Alert' : 'Event Status Report'} | ${params.namespace} | ${ts}`, destinationEmail: params.destinationEmail, namespace: params.namespace, timestamp: ts, hasAnomalies}}];"
-      },
-      "id": "build-report",
-      "name": "Build HTML Report",
+      "id": "mcp-call",
+      "name": "MCP Tool Call",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1060, 300]
+      "position": [
+        620,
+        300
+      ]
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {"caseSensitive": false, "leftValue": ""},
-          "conditions": [
-            {"id": "anomaly-check", "leftValue": "={{ $json.hasAnomalies }}", "rightValue": true, "operator": {"type": "boolean", "operation": "equals"}}
-          ]
-        }
+        "jsCode": "const http = require('http');\nconst input = $input.first().json;\nconst namespace = input.namespace;\nconst email = input.destinationEmail;\nconst toolName = input.toolName;\nconst mcpOutput = input.mcpOutput || '';\nconst ts = new Date().toISOString();\nconst title = \"Kubernetes Events Report\";\nconst subtitle = \"Event monitoring and anomaly detection via MCP\";\nconst escapedOutput = mcpOutput.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\nconst html = `<html><body style=\"margin:0;padding:0;background:#f0f0f0;font-family:'Red Hat Display',Arial,sans-serif;\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#f0f0f0;\"><tr><td align=\"center\" style=\"padding:24px;\">\n<table width=\"640\" style=\"max-width:640px;width:100%;\">\n<tr><td style=\"background:#151515;padding:16px 32px;border-radius:8px 8px 0 0;\">\n<span style=\"color:#EE0000;font-size:20px;font-weight:700;\">Red Hat</span>\n<span style=\"float:right;color:#C6C6C6;font-size:12px;line-height:28px;\">OpenShift Developer Sandbox</span></td></tr>\n<tr><td style=\"background:#DC382D;padding:28px 32px;\">\n<h1 style=\"margin:0;font-size:24px;color:#FFF;\">${title}</h1>\n<p style=\"margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);\">${subtitle}</p></td></tr>\n<tr><td style=\"background:#292929;padding:0;\">\n<table width=\"100%\"><tr>\n<td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:33%;\">\n<b style=\"display:block;color:#FFF;font-size:13px;\">${namespace}</b>Namespace</td>\n<td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;border-right:1px solid #3C3C3C;width:34%;\">\n<b style=\"display:block;color:#FFF;font-size:13px;\">${ts}</b>Generated</td>\n<td style=\"padding:12px 16px;text-align:center;color:#A3A3A3;font-size:11px;width:33%;\">\n<b style=\"display:block;color:#FFF;font-size:13px;\">${toolName}</b>MCP Tool</td>\n</tr></table></td></tr>\n<tr><td style=\"background:#FFF;padding:28px 32px;\">\n<h2 style=\"margin:0 0 16px;font-size:17px;border-bottom:2px solid #DC382D;padding-bottom:10px;\">MCP Tool Output</h2>\n<pre style=\"background:#1E1E1E;color:#D4D4D4;padding:16px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;\">${escapedOutput}</pre>\n</td></tr>\n<tr><td style=\"background:#F5F5F5;padding:16px 32px;border-top:1px solid #E0E0E0;text-align:center;\">\n<span style=\"display:inline-block;background:#EE0000;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px;\">RED HAT</span>\n<span style=\"font-size:11px;color:#6A6E73;margin:0 8px;\">OpenShift MCP Server</span>\n<span style=\"font-size:11px;color:#DC382D;font-weight:600;margin:0 8px;\">n8n</span>\n</td></tr>\n<tr><td style=\"background:#151515;padding:20px 32px;border-radius:0 0 8px 8px;text-align:center;\">\n<p style=\"margin:0;font-size:12px;color:#A3A3A3;\">Auto-generated by n8n on <b style=\"color:#FFF;\">Red Hat OpenShift Developer Sandbox</b></p>\n</td></tr></table></td></tr></table></body></html>`;\nconst subject = `[Red Hat OpenShift] ${title} | ${namespace} | ${ts}`;\nconst mailBody = JSON.stringify({\n  From: { Name: 'n8n Workflow', Email: 'workflow@n8n.local' },\n  To: [{ Name: 'Admin', Email: email }],\n  Subject: subject,\n  HTML: html\n});\nreturn new Promise((resolve, reject) => {\n  const req = http.request({\n    hostname: 'n8n-mailpit',\n    port: 8025,\n    path: '/api/v1/send',\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(mailBody)\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', (chunk) => { data += chunk; });\n    res.on('end', () => {\n      resolve([{ json: { mailpitStatus: res.statusCode, mailpitResponse: data, subject } }]);\n    });\n  });\n  req.on('error', reject);\n  req.write(mailBody);\n  req.end();\n});\n"
       },
-      "id": "if-anomalies",
-      "name": "Has Anomalies?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [1280, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "http://n8n-mailpit:8025/api/v1/send",
-        "sendHeaders": true,
-        "headerParameters": {"parameters": [{"name": "Content-Type", "value": "application/json"}]},
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"From\": {\"Name\": \"n8n Workflow\", \"Email\": \"no-reply@n8n.local\"},\n  \"To\": [{\"Name\": \"\", \"Email\": \"{{ $json.destinationEmail }}\"}],\n  \"Subject\": \"{{ $json.subject }}\",\n  \"HTML\": {{ JSON.stringify($json.html) }}\n}",
-        "options": {"timeout": 30000}
-      },
-      "id": "send-alert",
-      "name": "Send Alert via Mailpit",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1500, 200]
-    },
-    {
-      "parameters": {},
-      "id": "no-action",
-      "name": "No Anomalies - Skip",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [1500, 400]
+      "id": "report-email",
+      "name": "Build Report & Send Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        300
+      ]
     }
   ],
   "connections": {
-    "Every 30 Minutes": {"main": [[{"node": "Set Parameters", "type": "main", "index": 0}]]},
-    "Set Parameters": {"main": [[{"node": "MCP: events_list", "type": "main", "index": 0}]]},
-    "MCP: events_list": {"main": [[{"node": "AI: Event Analysis", "type": "main", "index": 0}]]},
-    "AI: Event Analysis": {"main": [[{"node": "Build HTML Report", "type": "main", "index": 0}]]},
-    "Build HTML Report": {"main": [[{"node": "Has Anomalies?", "type": "main", "index": 0}]]},
-    "Has Anomalies?": {
+    "Manual Trigger": {
       "main": [
-        [{"node": "Send Alert via Mailpit", "type": "main", "index": 0}],
-        [{"node": "No Anomalies - Skip", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Set Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Parameters": {
+      "main": [
+        [
+          {
+            "node": "MCP Tool Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Tool Call": {
+      "main": [
+        [
+          {
+            "node": "Build Report & Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "settings": {"executionOrder": "v1"},
+  "settings": {
+    "executionOrder": "v1"
+  },
   "staticData": null,
   "pinData": {},
   "active": false
