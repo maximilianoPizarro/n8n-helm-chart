@@ -64,7 +64,7 @@ spec:
               mkdir -p /tmp/workflows
               {{- range .Values.workflows.autoImport.urls }}
               echo "Downloading {{ . }}"
-              wget -q -O "/tmp/workflows/$(basename {{ . }})" "{{ . }}" || echo "Failed: {{ . }}"
+              curl -sSL -o "/tmp/workflows/$(basename {{ . }})" "{{ . }}" || echo "Failed: {{ . }}"
               {{- end }}
               echo "Downloaded $(ls /tmp/workflows/*.json 2>/dev/null | wc -l) workflows"
           volumeMounts:
