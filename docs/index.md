@@ -510,7 +510,7 @@ graph LR
 <div class="section">
   <h2>Developer Sandbox Quick Start</h2>
   <p>For Red Hat OpenShift Developer Sandbox, use these values to ensure compatibility with restricted SCCs:</p>
-  <div class="code-block">enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}</div>
+  <div class="code-block">enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
 
   <table class="styled-table">
     <thead>
@@ -529,98 +529,91 @@ graph LR
 
 <div class="section">
   <h2>OpenShift MCP Server Workflow Examples</h2>
-  <p>Each workflow follows a <strong>6-node pipeline</strong> that calls MCP Server tools directly via JSON-RPC, passes real cluster data to an AI model for analysis, and delivers a branded HTML email report through Mailpit:</p>
-  <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Trigger → Set Parameters → <strong>MCP Tool Call</strong> (JSON-RPC) → <strong>AI Analysis</strong> (LiteLLM) → Build HTML Report → Send via Mailpit</div>
+  <p>Each workflow follows a <strong>4-node pipeline</strong> using the MCP Streamable HTTP protocol with full session handling (<code>initialize</code> → <code>notifications/initialized</code> → <code>tools/call</code> with <code>Mcp-Session-Id</code>) and delivers a branded HTML email report through Mailpit:</p>
+  <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Manual Trigger → Set Parameters → <strong>MCP Tool Call</strong> (Streamable HTTP + Session) → <strong>Build Report &amp; Send Email</strong> (Mailpit API)</div>
 
   <div class="workflow-card">
-    <h4>1. Pod Monitor - AI Agent with MCP Tools</h4>
-    <p>Calls <code>pods_list</code> via K8s MCP Server (JSON-RPC over Streamable HTTP) to retrieve all pods in the namespace, then passes the real pod data to Granite/Qwen3 for status analysis and sends a branded HTML email via Mailpit API.</p>
-    <div class="meta">
-      <span class="tag mcp">MCP: pods_list</span>
-      <span class="tag ai">Granite / Qwen3</span>
-      <span class="tag">Mailpit</span>
-      <span class="tag">Manual Trigger</span>
-    </div>
-  </div>
-
-  <div class="workflow-card">
-    <h4>2. Pod Monitor - MCP + Granite + Email</h4>
-    <p>Calls <code>monitorDeployments</code> via Quarkus MCP Server to get deployment health metrics, then uses AI to analyze healthy vs unhealthy deployments, replica mismatches, and sends the report via Mailpit.</p>
+    <h4>1. Deployment Monitor</h4>
+    <p>Calls <code>monitorDeployments</code> via Quarkus MCP Server to retrieve deployment health, replica counts, and rollout status. Generates a branded HTML report and sends via Mailpit API.</p>
     <div class="meta">
       <span class="tag mcp">MCP: monitorDeployments</span>
-      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">Quarkus MCP (8080)</span>
       <span class="tag">Mailpit</span>
-      <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
-    <h4>3. Deployment Rollout Status</h4>
-    <p>Calls <code>monitorDeployments</code> to retrieve real-time deployment data, then AI analyzes replica health (desired vs available vs ready), rollout strategy, container image versions, and flags deployments with mismatches.</p>
+    <h4>2. Pod Status</h4>
+    <p>Calls <code>pods_list_in_namespace</code> via K8s MCP Server to list all pods with status, readiness, restarts, and node placement. SSE response parsed automatically.</p>
     <div class="meta">
-      <span class="tag mcp">MCP: monitorDeployments</span>
-      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag mcp">MCP: pods_list_in_namespace</span>
+      <span class="tag">K8s MCP (8085)</span>
       <span class="tag">Mailpit</span>
-      <span class="tag">Manual Trigger</span>
     </div>
   </div>
 
   <div class="workflow-card">
-    <h4>4. Resource Quota Monitor</h4>
-    <p>Calls <code>getPerformanceMetrics</code> via Quarkus MCP Server every 6 hours, then AI analyzes CPU/memory utilization, ResourceQuota limits vs usage, top resource consumers. Flags resources above 80% threshold.</p>
+    <h4>3. Pod Disruption Analyzer</h4>
+    <p>Calls <code>analyzePodDisruptions</code> via Quarkus MCP Server to detect evictions, OOM kills, and restart patterns in the last 24 hours.</p>
     <div class="meta">
-      <span class="tag mcp">MCP: getPerformanceMetrics</span>
-      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag mcp">MCP: analyzePodDisruptions</span>
+      <span class="tag">Quarkus MCP (8080)</span>
       <span class="tag">Mailpit</span>
-      <span class="tag">Schedule (6h)</span>
     </div>
   </div>
 
   <div class="workflow-card">
-    <h4>5. Security Audit</h4>
-    <p>Calls <code>checkClusterHealth</code> via Quarkus MCP Server, then AI performs a security posture assessment following CIS benchmarks: ServiceAccount roles, SCC usage, NetworkPolicy, Secrets audit. Findings classified as PASS, WARNING, or CRITICAL.</p>
-    <div class="meta">
-      <span class="tag mcp">MCP: checkClusterHealth</span>
-      <span class="tag ai">Granite / Qwen3</span>
-      <span class="tag">Mailpit</span>
-      <span class="tag">Manual Trigger</span>
-    </div>
-  </div>
-
-  <div class="workflow-card">
-    <h4>6. Route &amp; TLS Expiry Check</h4>
-    <p>Calls <code>resources_list</code> (resource_type: routes) via K8s MCP Server daily, then AI analyzes route configuration, TLS termination types, and certificate expiry. Alerts on certificates expiring within 30 days.</p>
-    <div class="meta">
-      <span class="tag mcp">MCP: resources_list</span>
-      <span class="tag ai">Granite / Qwen3</span>
-      <span class="tag">Mailpit</span>
-      <span class="tag">Schedule (daily)</span>
-    </div>
-  </div>
-
-  <div class="workflow-card">
-    <h4>7. Event Anomaly Detector</h4>
-    <p>Calls <code>events_list</code> via K8s MCP Server every 30 minutes, then AI detects anomalous Kubernetes Events: repeated warnings, OOMKilled, FailedScheduling, image pull errors. Conditional alerts only when anomalies are found.</p>
+    <h4>4. Event Monitor</h4>
+    <p>Calls <code>events_list</code> via K8s MCP Server to list Kubernetes events (warnings, errors, state changes) for the namespace.</p>
     <div class="meta">
       <span class="tag mcp">MCP: events_list</span>
-      <span class="tag ai">Granite / Qwen3</span>
+      <span class="tag">K8s MCP (8085)</span>
       <span class="tag">Mailpit</span>
-      <span class="tag">Schedule (30min)</span>
+    </div>
+  </div>
+
+  <div class="workflow-card">
+    <h4>5. Route Monitor</h4>
+    <p>Calls <code>resources_list</code> (Route) via K8s MCP Server to inventory OpenShift Routes with hosts, TLS termination, and target services.</p>
+    <div class="meta">
+      <span class="tag mcp">MCP: resources_list (Route)</span>
+      <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">Mailpit</span>
+    </div>
+  </div>
+
+  <div class="workflow-card">
+    <h4>6. Performance Metrics</h4>
+    <p>Calls <code>getPerformanceMetrics</code> via Quarkus MCP Server to retrieve CPU/memory usage metrics for nodes and pods in the namespace.</p>
+    <div class="meta">
+      <span class="tag mcp">MCP: getPerformanceMetrics</span>
+      <span class="tag">Quarkus MCP (8080)</span>
+      <span class="tag">Mailpit</span>
+    </div>
+  </div>
+
+  <div class="workflow-card">
+    <h4>7. Helm Releases</h4>
+    <p>Calls <code>helm_list</code> via K8s MCP Server to inventory all Helm releases in the namespace with chart versions, app versions, and deployment status.</p>
+    <div class="meta">
+      <span class="tag mcp">MCP: helm_list</span>
+      <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <table class="styled-table">
     <thead>
-      <tr><th>#</th><th>Workflow</th><th>MCP Tool</th><th>MCP Server</th><th>Trigger</th></tr>
+      <tr><th>#</th><th>Workflow</th><th>MCP Tool</th><th>MCP Server</th><th>Protocol</th></tr>
     </thead>
     <tbody>
-      <tr><td>1</td><td>Pod Monitor - AI Agent</td><td><code>pods_list</code></td><td>K8s MCP (8085)</td><td>Manual</td></tr>
-      <tr><td>2</td><td>Pod Monitor - MCP + Granite</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
-      <tr><td>3</td><td>Deployment Rollout Status</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
-      <tr><td>4</td><td>Resource Quota Monitor</td><td><code>getPerformanceMetrics</code></td><td>Quarkus MCP (8080)</td><td>Schedule (6h)</td></tr>
-      <tr><td>5</td><td>Security Audit</td><td><code>checkClusterHealth</code></td><td>Quarkus MCP (8080)</td><td>Manual</td></tr>
-      <tr><td>6</td><td>Route &amp; TLS Expiry</td><td><code>resources_list</code></td><td>K8s MCP (8085)</td><td>Schedule (daily)</td></tr>
-      <tr><td>7</td><td>Event Anomaly Detector</td><td><code>events_list</code></td><td>K8s MCP (8085)</td><td>Schedule (30min)</td></tr>
+      <tr><td>1</td><td>Deployment Monitor</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
+      <tr><td>2</td><td>Pod Status</td><td><code>pods_list_in_namespace</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>3</td><td>Pod Disruption Analyzer</td><td><code>analyzePodDisruptions</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
+      <tr><td>4</td><td>Event Monitor</td><td><code>events_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>5</td><td>Route Monitor</td><td><code>resources_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>6</td><td>Performance Metrics</td><td><code>getPerformanceMetrics</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
+      <tr><td>7</td><td>Helm Releases</td><td><code>helm_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
     </tbody>
   </table>
 
@@ -741,8 +734,8 @@ graph LR
 
   <h4 style="color:var(--n8n-green);margin-top:20px;">Added</h4>
   <ul>
-    <li><strong>OpenShift MCP Server integration</strong> — 7 workflows calling MCP tools directly via JSON-RPC (<code>pods_list</code>, <code>monitorDeployments</code>, <code>getPerformanceMetrics</code>, <code>checkClusterHealth</code>, <code>events_list</code>, <code>resources_list</code>) with AI analysis (Granite/Qwen3 via LiteLLM) and branded HTML email reports via Mailpit</li>
-    <li><strong>Workflow auto-import Job</strong> — Helm post-install hook downloads and imports workflow JSON files from <a href="https://github.com/maximilianoPizarro/n8n-sandbox">n8n-sandbox</a></li>
+    <li><strong>OpenShift MCP Server integration</strong> — 7 workflows using MCP Streamable HTTP protocol with full session handling (<code>monitorDeployments</code>, <code>pods_list_in_namespace</code>, <code>analyzePodDisruptions</code>, <code>events_list</code>, <code>resources_list</code>, <code>getPerformanceMetrics</code>, <code>helm_list</code>) and branded HTML email reports via Mailpit API</li>
+    <li><strong>Workflow auto-import via initContainers</strong> — Deployment initContainers download and import workflow JSON files before n8n starts, avoiding PVC RWO Multi-Attach conflicts</li>
     <li><strong>Mailpit</strong> — Optional SMTP test server with web UI for previewing email reports without external email infrastructure</li>
     <li><strong>Developer Sandbox compatibility</strong> — <code>enableServiceLinks: false</code> to avoid <code>N8N_PORT</code> env conflict, <code>route.sccRoleDisabled</code> for restricted RBAC, empty <code>podSecurityContext</code> for random UID</li>
     <li><strong>Red Hat UBI container image</strong> — Built on <code>registry.access.redhat.com/ubi9/nodejs-22</code>, published at <code>quay.io/maximilianopizarro/n8n</code> via GitHub Actions</li>

@@ -1,22 +1,24 @@
-# n8n Helm Charts on Red Hat OpenShift
-<link rel="icon" href="https://raw.githubusercontent.com/maximilianoPizarro/botpress-helm-chart/main/favicon-152.ico" type="image/x-icon" >
+# n8n Helm Chart for Kubernetes & OpenShift
+
 <p align="left">
-<img src="https://img.shields.io/badge/redhat-CC0000?style=for-the-badge&logo=redhat&logoColor=white" alt="Redhat">
-<img src="https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white" alt="kubernetes">
+<img src="https://img.shields.io/badge/redhat-CC0000?style=for-the-badge&logo=redhat&logoColor=white" alt="Red Hat">
+<img src="https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes">
 <img src="https://img.shields.io/badge/helm-0db7ed?style=for-the-badge&logo=helm&logoColor=white" alt="Helm">
-<img src="https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white" alt="shell">
-<a href="https://www.linkedin.com/in/maximiliano-gregorio-pizarro-consultor-it"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin" /></a>
 <a href="https://artifacthub.io/packages/search?repo=n8n-openshift"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/n8n-openshift" alt="Artifact Hub" /></a>
+<a href="https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/openshift-mcp-server" alt="OpenShift MCP Server" /></a>
 </p>
 
+> **Documentation & Screenshots**: [maximilianopizarro.github.io/n8n-helm-chart](https://maximilianopizarro.github.io/n8n-helm-chart/)
 
-# n8n Helm Chart for Kubernetes
+[n8n](https://github.com/n8n-io/n8n) is an extendable workflow automation tool. This Helm chart deploys n8n on **Kubernetes** and **Red Hat OpenShift** with native MCP Server integration, Developer Sandbox support, Mailpit email testing, and workflow auto-import.
 
-[n8n](https://github.com/n8n-io/n8n) is an extendable workflow automation tool.
+## Key Features (v1.16.0)
 
-
-
-The Helm chart source code location is [github.com/maximilianoPizarro/n8n-helm-chart](https://github.com/maximilianoPizarro/n8n-helm-chart)
+- **OpenShift MCP Server Integration** — 7 workflows using MCP Streamable HTTP protocol with session handling
+- **Workflow Auto-Import** — initContainers download and import workflows before n8n starts
+- **Mailpit** — Optional SMTP test server with web UI for email report preview
+- **Developer Sandbox** — Full compatibility with restricted SCCs and random UIDs
+- **MCP Tools**: `monitorDeployments`, `pods_list_in_namespace`, `analyzePodDisruptions`, `events_list`, `resources_list`, `getPerformanceMetrics`, `helm_list`
 
 ## Requirements
 
@@ -75,8 +77,26 @@ helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
 ```
 
 ```shell
-helm install n8n n8n-openshift/n8n --version 1.15.5
+helm install n8n n8n-openshift/n8n --version 1.16.0
 ```
+
+## OpenShift MCP Server
+
+The included workflows require the [OpenShift MCP Server](https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server) deployed in your cluster:
+
+```shell
+helm repo add openshift-mcp https://maximilianoPizarro.github.io/openshift-mcp-server
+helm install openshift-mcp-server openshift-mcp/openshift-mcp-server
+```
+
+| Component | Port | Tools |
+|-----------|------|-------|
+| Quarkus MCP Server | 8080 | `monitorDeployments`, `analyzePodDisruptions`, `getPerformanceMetrics`, `deployDatabase` |
+| K8s MCP Server | 8085 | `pods_list_in_namespace`, `events_list`, `resources_list`, `helm_list` |
+| MCP Inspector | Web UI | Interactive MCP tool testing |
+| LiteLLM Proxy | 4000 | OpenAI-compatible proxy for Granite/Qwen models |
+
+Full documentation: [maximilianopizarro.github.io/openshift-mcp-server](https://maximilianopizarro.github.io/openshift-mcp-server)
 
 # Examples
 
@@ -1371,6 +1391,7 @@ helm upgrade [RELEASE_NAME] community-charts/n8n
 
 * <https://github.com/maximilianoPizarro/n8n-helm-chart>
 * <https://github.com/n8n-io/n8n>
+* <https://github.com/maximilianoPizarro/openshift-mcp-server>
 
 ## Chart Development
 
