@@ -1,8 +1,12 @@
 image:
-  repository: quay.io/maximilianopizarro/n8n
+  # NOTE: quay.io/maximilianopizarro/n8n UBI image needs rebuild (semver module missing).
+  # Using official image temporarily. Switch back to UBI after fixing container/Containerfile.
+  # repository: quay.io/maximilianopizarro/n8n
+  # variant: "ubi"
+  repository: n8nio/n8n
   pullPolicy: IfNotPresent
   tag: ""
-  variant: "ubi"
+  variant: "official"
 
 enableServiceLinks: false
 
