@@ -701,6 +701,14 @@
           "required": [],
           "title": "tag",
           "type": "string"
+        },
+        "variant": {
+          "default": "official",
+          "description": "Image variant: 'official' for Alpine-based n8nio/n8n (uses wget), 'ubi' for Red Hat UBI quay.io image (uses curl). Affects download tool in workflow auto-import initContainers.",
+          "enum": ["official", "ubi"],
+          "required": [],
+          "title": "variant",
+          "type": "string"
         }
       },
       "required": [

@@ -2,6 +2,7 @@ image:
   repository: quay.io/maximilianopizarro/n8n
   pullPolicy: IfNotPresent
   tag: ""
+  variant: "ubi"
 
 enableServiceLinks: false
 

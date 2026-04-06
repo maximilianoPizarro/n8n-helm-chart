@@ -15,6 +15,7 @@
 ## Key Features (v1.16.0)
 
 - **OpenShift MCP Server Integration** — 7 workflows using MCP Streamable HTTP protocol with session handling
+- **AI-Powered Analysis** — Each workflow includes an AI formatting step via LiteLLM/Granite that analyzes, summarizes, and explains the raw MCP output with health assessments and recommendations
 - **Workflow Auto-Import** — initContainers download and import workflows before n8n starts
 - **Mailpit** — Optional SMTP test server with web UI for email report preview
 - **Developer Sandbox** — Full compatibility with restricted SCCs and random UIDs

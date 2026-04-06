@@ -537,91 +537,98 @@ graph LR
 
 <div class="section">
   <h2>OpenShift MCP Server Workflow Examples</h2>
-  <p>Each workflow follows a <strong>4-node pipeline</strong> using the MCP Streamable HTTP protocol with full session handling (<code>initialize</code> → <code>notifications/initialized</code> → <code>tools/call</code> with <code>Mcp-Session-Id</code>) and delivers a branded HTML email report through Mailpit:</p>
-  <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Manual Trigger → Set Parameters → <strong>MCP Tool Call</strong> (Streamable HTTP + Session) → <strong>Build Report &amp; Send Email</strong> (Mailpit API)</div>
+  <p>Each workflow follows a <strong>5-node pipeline</strong> using the MCP Streamable HTTP protocol with full session handling (<code>initialize</code> → <code>notifications/initialized</code> → <code>tools/call</code> with <code>Mcp-Session-Id</code>), AI-powered analysis via <strong>LiteLLM/Granite</strong>, and delivers a branded HTML email report through Mailpit:</p>
+  <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Manual Trigger → Set Parameters → <strong>MCP Tool Call</strong> (Streamable HTTP + Session) → <strong>AI Format &amp; Explain</strong> (LiteLLM/Granite) → <strong>Build Report &amp; Send Email</strong> (Mailpit API)</div>
 
   <div class="workflow-card">
     <h4>1. Deployment Monitor</h4>
-    <p>Calls <code>monitorDeployments</code> via Quarkus MCP Server to retrieve deployment health, replica counts, and rollout status. Generates a branded HTML report and sends via Mailpit API.</p>
+    <p>Calls <code>monitorDeployments</code> via Quarkus MCP Server to retrieve deployment health, replica counts, and rollout status. AI formats and explains the output via LiteLLM/Granite, then delivers a branded HTML email report via Mailpit.</p>
     <div class="meta">
       <span class="tag mcp">MCP: monitorDeployments</span>
       <span class="tag">Quarkus MCP (8080)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>2. Pod Status</h4>
-    <p>Calls <code>pods_list_in_namespace</code> via K8s MCP Server to list all pods with status, readiness, restarts, and node placement. SSE response parsed automatically.</p>
+    <p>Calls <code>pods_list_in_namespace</code> via K8s MCP Server to list all pods with status, readiness, restarts, and node placement. AI analyzes the pod inventory and provides health assessment via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: pods_list_in_namespace</span>
       <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>3. Pod Disruption Analyzer</h4>
-    <p>Calls <code>analyzePodDisruptions</code> via Quarkus MCP Server to detect evictions, OOM kills, and restart patterns in the last 24 hours.</p>
+    <p>Calls <code>analyzePodDisruptions</code> via Quarkus MCP Server to detect evictions, OOM kills, and restart patterns in the last 24 hours. AI provides a structured disruption analysis with recommendations via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: analyzePodDisruptions</span>
       <span class="tag">Quarkus MCP (8080)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>4. Event Monitor</h4>
-    <p>Calls <code>events_list</code> via K8s MCP Server to list Kubernetes events (warnings, errors, state changes) for the namespace.</p>
+    <p>Calls <code>events_list</code> via K8s MCP Server to list Kubernetes events (warnings, errors, state changes) for the namespace. AI detects anomalies and highlights critical events via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: events_list</span>
       <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>5. Route Monitor</h4>
-    <p>Calls <code>resources_list</code> (Route) via K8s MCP Server to inventory OpenShift Routes with hosts, TLS termination, and target services.</p>
+    <p>Calls <code>resources_list</code> (Route) via K8s MCP Server to inventory OpenShift Routes with hosts, TLS termination, and target services. AI summarizes route configuration and TLS status via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: resources_list (Route)</span>
       <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>6. Performance Metrics</h4>
-    <p>Calls <code>getPerformanceMetrics</code> via Quarkus MCP Server to retrieve CPU/memory usage metrics for nodes and pods in the namespace.</p>
+    <p>Calls <code>getPerformanceMetrics</code> via Quarkus MCP Server to retrieve CPU/memory usage metrics for nodes and pods in the namespace. AI analyzes resource utilization and provides optimization recommendations via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: getPerformanceMetrics</span>
       <span class="tag">Quarkus MCP (8080)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <div class="workflow-card">
     <h4>7. Helm Releases</h4>
-    <p>Calls <code>helm_list</code> via K8s MCP Server to inventory all Helm releases in the namespace with chart versions, app versions, and deployment status.</p>
+    <p>Calls <code>helm_list</code> via K8s MCP Server to inventory all Helm releases in the namespace with chart versions, app versions, and deployment status. AI formats the release inventory with health assessment via LiteLLM/Granite.</p>
     <div class="meta">
       <span class="tag mcp">MCP: helm_list</span>
       <span class="tag">K8s MCP (8085)</span>
+      <span class="tag">AI: Granite</span>
       <span class="tag">Mailpit</span>
     </div>
   </div>
 
   <table class="styled-table">
     <thead>
-      <tr><th>#</th><th>Workflow</th><th>MCP Tool</th><th>MCP Server</th><th>Protocol</th></tr>
+      <tr><th>#</th><th>Workflow</th><th>MCP Tool</th><th>MCP Server</th><th>AI Model</th><th>Protocol</th></tr>
     </thead>
     <tbody>
-      <tr><td>1</td><td>Deployment Monitor</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
-      <tr><td>2</td><td>Pod Status</td><td><code>pods_list_in_namespace</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
-      <tr><td>3</td><td>Pod Disruption Analyzer</td><td><code>analyzePodDisruptions</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
-      <tr><td>4</td><td>Event Monitor</td><td><code>events_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
-      <tr><td>5</td><td>Route Monitor</td><td><code>resources_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
-      <tr><td>6</td><td>Performance Metrics</td><td><code>getPerformanceMetrics</code></td><td>Quarkus MCP (8080)</td><td>Streamable HTTP</td></tr>
-      <tr><td>7</td><td>Helm Releases</td><td><code>helm_list</code></td><td>K8s MCP (8085)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>1</td><td>Deployment Monitor</td><td><code>monitorDeployments</code></td><td>Quarkus MCP (8080)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP</td></tr>
+      <tr><td>2</td><td>Pod Status</td><td><code>pods_list_in_namespace</code></td><td>K8s MCP (8085)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>3</td><td>Pod Disruption Analyzer</td><td><code>analyzePodDisruptions</code></td><td>Quarkus MCP (8080)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP</td></tr>
+      <tr><td>4</td><td>Event Monitor</td><td><code>events_list</code></td><td>K8s MCP (8085)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>5</td><td>Route Monitor</td><td><code>resources_list</code></td><td>K8s MCP (8085)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP + SSE</td></tr>
+      <tr><td>6</td><td>Performance Metrics</td><td><code>getPerformanceMetrics</code></td><td>Quarkus MCP (8080)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP</td></tr>
+      <tr><td>7</td><td>Helm Releases</td><td><code>helm_list</code></td><td>K8s MCP (8085)</td><td>Granite (LiteLLM)</td><td>Streamable HTTP + SSE</td></tr>
     </tbody>
   </table>
 

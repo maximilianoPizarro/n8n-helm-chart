@@ -9,6 +9,9 @@ image:
   # -- Overrides the image tag whose default is the chart appVersion.
   # This tag is also used as the source version for the quay.io/maximilianopizarro/n8n UBI image build.
   tag: ""
+  # -- Image variant: "official" for Alpine-based n8nio/n8n (uses wget), "ubi" for Red Hat UBI quay.io image (uses curl).
+  # This affects which download tool is used in workflow auto-import initContainers.
+  variant: "official"
 
 # -- This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
