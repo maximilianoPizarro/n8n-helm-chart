@@ -480,6 +480,14 @@ graph LR
       <div class="caption">MCP Inspector - monitorDeployments: 11 deployments healthy, 0 issues</div>
     </div>
   </div>
+
+  <h3>Podman Local Development</h3>
+  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with Red Hat UBI 9 image">
+      <div class="caption">n8n 1.123.28 via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9 + Node.js 22)</div>
+    </div>
+  </div>
 </div>
 
 <div class="section" id="installation">
@@ -705,6 +713,13 @@ graph LR
 
   <h3>Build &amp; Run Locally with Podman</h3>
   <p>You can build and test the UBI container image locally using Podman (or Docker) before deploying to a cluster:</p>
+
+  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with UBI 9 image from Quay.io">
+      <div class="caption">n8n 1.123.28 running locally via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9)</div>
+    </div>
+  </div>
 
   <h4>Build the image</h4>
   <div class="code-block">podman build -t quay.io/maximilianopizarro/n8n:1.123.28 \<br>&nbsp;&nbsp;-f container/Containerfile \<br>&nbsp;&nbsp;--build-arg N8N_VERSION=1.123.28 .</div>

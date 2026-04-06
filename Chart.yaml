@@ -75,6 +75,8 @@ annotations:
       url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-all-workflows-list.png
     - title: n8n Dashboard
       url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-dashboard.png
+    - title: n8n via Podman - Red Hat UBI 9 Container
+      url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-podman-welcome.png
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server
   artifacthub.io/links: |
