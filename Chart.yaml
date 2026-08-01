@@ -1,7 +1,7 @@
 apiVersion: v2
 name: n8n
-version: 1.16.0
-appVersion: 1.123.28
+version: 1.17.0
+appVersion: 2.32.7
 kubeVersion: ">=1.20.0"
 type: application
 description: "Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift, a fair-code workflow automation platform with native AI capabilities for technical teams. Easily automate tasks across different services. Includes optional Mailpit for email testing and OpenShift Developer Sandbox support."
@@ -40,6 +40,10 @@ annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
+    - kind: changed
+      description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable)"
+    - kind: fixed
+      description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER env vars from persistence.mountPath"
     - kind: added
       description: "Add 7 MCP Server workflows with real JSON-RPC tool calls (pods_list, monitorDeployments, getPerformanceMetrics, checkClusterHealth, events_list, resources_list) + AI analysis via LiteLLM + Mailpit email reports"
     - kind: added
@@ -60,8 +64,6 @@ annotations:
       description: "Add image.variant option (official/ubi) for selecting between Alpine wget and UBI curl in workflow auto-import initContainers"
     - kind: added
       description: "Add AI Format & Explain pipeline step to all 7 MCP workflows via LiteLLM/Granite with health assessments"
-    - kind: changed
-      description: "Update n8n app version to 1.123.28"
     - kind: changed
       description: "Redesign GitHub Pages documentation with MCP pipeline architecture, lightbox viewer, and Mermaid diagrams"
     - kind: fixed

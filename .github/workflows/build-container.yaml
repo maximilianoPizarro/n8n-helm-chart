@@ -11,7 +11,7 @@ on:
       n8n_version:
         description: 'n8n version to build'
         required: false
-        default: '1.123.28'
+        default: '2.32.7'
 
 env:
   REGISTRY: quay.io

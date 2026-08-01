@@ -12,8 +12,10 @@
 
 [n8n](https://github.com/n8n-io/n8n) is an extendable workflow automation tool. This Helm chart deploys n8n on **Kubernetes** and **Red Hat OpenShift** with native MCP Server integration, Developer Sandbox support, Mailpit email testing, and workflow auto-import.
 
-## Key Features (v1.16.0)
+## Key Features (v1.17.0)
 
+- **n8n 2.32.7** — Upgraded from 1.123.28; chart 1.16.0 remains available for existing catalog RC installs
+- **OpenShift EACCES fix** — Always injects `HOME` and `N8N_USER_FOLDER` from `main.persistence.mountPath` to prevent `mkdir '/.n8n'` failures under random UIDs
 - **OpenShift MCP Server Integration** — 7 workflows using MCP Streamable HTTP protocol with session handling
 - **AI-Powered Analysis** — Each workflow includes an AI formatting step via LiteLLM/Granite that analyzes, summarizes, and explains the raw MCP output with health assessments and recommendations
 - **Workflow Auto-Import** — initContainers download and import workflows before n8n starts
@@ -78,7 +80,7 @@ helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
 ```
 
 ```shell
-helm install n8n n8n-openshift/n8n --version 1.16.0
+helm install n8n n8n-openshift/n8n --version 1.17.0
 ```
 
 ## OpenShift MCP Server
@@ -155,8 +157,33 @@ The chart supports two image variants via `image.variant` in `values.yaml`:
 ```yaml
 image:
   repository: quay.io/maximilianopizarro/n8n
-  tag: "1.123.28"
+  tag: "2.32.7"
   variant: "ubi"
+```
+
+### OpenShift user folder (EACCES fix)
+
+On OpenShift Developer Sandbox, pods often run with a random UID and `HOME=/`. Without an explicit writable user folder, n8n tries `mkdir '/.n8n'` and crashes with `EACCES`.
+
+Chart **1.17.0+** always injects:
+
+- `HOME`
+- `N8N_USER_FOLDER`
+
+derived from `main.persistence.mountPath` (e.g. `/data` → data at `/data/.n8n`, default `/home/node/.n8n` → parent `/home/node`).
+
+For Sandbox installs, keep:
+
+```yaml
+main:
+  persistence:
+    mountPath: "/data"
+  extraEnvVars:
+    N8N_USER_FOLDER: "/data"
+    HOME: "/data"
+  config:
+    n8n:
+      user_folder: "/data"
 ```
 
 ### Run from Quay.io
@@ -165,7 +192,7 @@ image:
 podman run -d --name n8n \
   -p 5678:5678 \
   -v n8n-data:/data \
-  quay.io/maximilianopizarro/n8n:1.123.28
+  quay.io/maximilianopizarro/n8n:2.32.7
 ```
 
 Open [http://localhost:5678](http://localhost:5678) to access the n8n editor.
@@ -173,9 +200,9 @@ Open [http://localhost:5678](http://localhost:5678) to access the n8n editor.
 ### Build locally
 
 ```shell
-podman build -t quay.io/maximilianopizarro/n8n:1.123.28 \
+podman build -t quay.io/maximilianopizarro/n8n:2.32.7 \
   -f container/Containerfile \
-  --build-arg N8N_VERSION=1.123.28 .
+  --build-arg N8N_VERSION=2.32.7 .
 ```
 
 ### Run with Mailpit for email testing
@@ -192,7 +219,7 @@ podman run -d --name n8n \
   -v n8n-data:/data \
   -e NODE_FUNCTION_ALLOW_BUILTIN="*" \
   -e NODE_FUNCTION_ALLOW_EXTERNAL="*" \
-  quay.io/maximilianopizarro/n8n:1.123.28
+  quay.io/maximilianopizarro/n8n:2.32.7
 ```
 
 Access Mailpit at [http://localhost:8025](http://localhost:8025).
@@ -208,7 +235,7 @@ podman stop n8n && podman rm n8n     # Stop and remove
 
 | Build Stage | Base Image | Purpose |
 |-------------|-----------|---------|
-| 1. Source | `n8nio/n8n:1.123.28` | Extract n8n node_modules |
+| 1. Source | `n8nio/n8n:2.32.7` | Extract n8n node_modules |
 | 2. Builder | `ubi9/nodejs-22` | Rebuild sqlite3 native module for Node.js 22 + glibc |
 | 3. Runtime | `ubi9/nodejs-22-minimal` | Minimal production image |
 
