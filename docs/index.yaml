@@ -4,13 +4,15 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
-          description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable)"
+          description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable). Chart 1.16.0 remains available for existing catalog RC installs"
         - kind: fixed
-          description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER env vars from persistence.mountPath"
+          description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER from main.persistence.mountPath"
+        - kind: changed
+          description: "Document OpenShift Developer Sandbox install path and n8n 1.x to 2.x migration notes"
         - kind: added
-          description: "Add 7 MCP Server workflows with real JSON-RPC tool calls (pods_list, monitorDeployments, getPerformanceMetrics, checkClusterHealth, events_list, resources_list) + AI analysis via LiteLLM + Mailpit email reports"
+          description: "Add 7 MCP Server workflows with real JSON-RPC tool calls + AI analysis via LiteLLM/Granite + Mailpit email reports"
         - kind: added
-          description: "Add workflow auto-import Job (Helm post-install hook) from n8n-sandbox GitHub repository"
+          description: "Add workflow auto-import via Deployment initContainers (download + n8n import:workflow)"
         - kind: added
           description: "Add Mailpit as optional SMTP test service with OpenShift Route support"
         - kind: added
@@ -61,7 +63,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.32.7
-    created: "2026-08-01T13:07:41.1272592-03:00"
+    created: "2026-08-01T13:13:22.7381793-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -71,7 +73,7 @@ entries:
       a fair-code workflow automation platform with native AI capabilities for technical
       teams. Easily automate tasks across different services. Includes optional Mailpit
       for email testing and OpenShift Developer Sandbox support.
-    digest: b57deb80d7cdb1ba1a08a7ddcfcc7054884a9e9fe587b34984420061cc630b75
+    digest: 8259b55e00501eb05c67c311e935c443b5b7bf9b566438e7578151a48783de55
     home: https://maximilianopizarro.github.io/n8n-helm-chart/
     icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
     keywords:
@@ -160,7 +162,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.123.28
-    created: "2026-08-01T13:07:41.1157378-03:00"
+    created: "2026-08-01T13:13:22.7256712-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -209,7 +211,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2026-08-01T13:07:41.0952535-03:00"
+    created: "2026-08-01T13:13:22.7136214-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -245,4 +247,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2026-08-01T13:07:41.0746541-03:00"
+generated: "2026-08-01T13:13:22.7014868-03:00"

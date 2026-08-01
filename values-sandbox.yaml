@@ -1,0 +1,76 @@
+# OpenShift Developer Sandbox values for n8n chart 1.17.0 (n8n 2.32.7)
+#
+# Prerequisites:
+#   1. Create a PVC named "n8n" (2Gi, RWO) in your project, or change existingClaim below.
+#   2. Deploy OpenShift MCP Server if you want the MCP workflows to call cluster tools.
+#
+# Install:
+#   helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
+#   helm install n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml
+#
+# Notes:
+#   - Chart 1.17.0+ injects HOME and N8N_USER_FOLDER from main.persistence.mountPath.
+#     Do not set those again in extraEnvVars (avoids duplicate env keys).
+#   - Leave main.securityContext / main.podSecurityContext unset so restricted-v2
+#     can assign a random UID in the namespace range.
+
+image:
+  repository: quay.io/maximilianopizarro/n8n
+  pullPolicy: IfNotPresent
+  tag: "2.32.7"
+  variant: "ubi"
+
+enableServiceLinks: false
+
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+
+route:
+  enabled: true
+  sccRoleDisabled: true
+  host: ""
+
+main:
+  extraEnvVars:
+    N8N_LISTEN_ADDRESS: "0.0.0.0"
+    NODE_FUNCTION_ALLOW_BUILTIN: "*"
+    NODE_FUNCTION_ALLOW_EXTERNAL: "*"
+  config:
+    n8n:
+      editor_base_url: ""
+      user_folder: "/data"
+  service:
+    type: ClusterIP
+    port: 5678
+  persistence:
+    enabled: true
+    existingClaim: n8n
+    mountPath: "/data"
+
+mailpit:
+  enabled: true
+  route:
+    enabled: true
+  podSecurityContext: {}
+
+workflows:
+  autoImport:
+    enabled: true
+    urls:
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-agent.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-pod-monitor-mcp-granite.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-deployment-rollout-status.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-resource-quota-monitor.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-security-audit.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-route-tls-expiry.json
+      - https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/workflows/workflow-event-anomaly-detector.json

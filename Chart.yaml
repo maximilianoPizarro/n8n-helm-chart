@@ -41,13 +41,15 @@ annotations:
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable)"
+      description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable). Chart 1.16.0 remains available for existing catalog RC installs"
     - kind: fixed
-      description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER env vars from persistence.mountPath"
+      description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER from main.persistence.mountPath"
+    - kind: changed
+      description: "Document OpenShift Developer Sandbox install path and n8n 1.x to 2.x migration notes"
     - kind: added
-      description: "Add 7 MCP Server workflows with real JSON-RPC tool calls (pods_list, monitorDeployments, getPerformanceMetrics, checkClusterHealth, events_list, resources_list) + AI analysis via LiteLLM + Mailpit email reports"
+      description: "Add 7 MCP Server workflows with real JSON-RPC tool calls + AI analysis via LiteLLM/Granite + Mailpit email reports"
     - kind: added
-      description: "Add workflow auto-import Job (Helm post-install hook) from n8n-sandbox GitHub repository"
+      description: "Add workflow auto-import via Deployment initContainers (download + n8n import:workflow)"
     - kind: added
       description: "Add Mailpit as optional SMTP test service with OpenShift Route support"
     - kind: added

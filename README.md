@@ -83,6 +83,20 @@ helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
 helm install n8n n8n-openshift/n8n --version 1.17.0
 ```
 
+### OpenShift Developer Sandbox
+
+```shell
+# Create PVC (RWO 2Gi) named "n8n", then:
+helm install n8n n8n-openshift/n8n --version 1.17.0 \
+  -f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml
+```
+
+Keep chart **1.16.0** (n8n 1.123.28) for an existing catalog RC:
+
+```shell
+helm install n8n n8n-openshift/n8n --version 1.16.0
+```
+
 ## OpenShift MCP Server
 
 The included workflows require the [OpenShift MCP Server](https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server) deployed in your cluster:
@@ -165,22 +179,20 @@ image:
 
 On OpenShift Developer Sandbox, pods often run with a random UID and `HOME=/`. Without an explicit writable user folder, n8n tries `mkdir '/.n8n'` and crashes with `EACCES`.
 
-Chart **1.17.0+** always injects:
+Chart **1.17.0+** always injects `HOME` and `N8N_USER_FOLDER` from `main.persistence.mountPath`:
 
-- `HOME`
-- `N8N_USER_FOLDER`
+| `mountPath` | Injected `HOME` / `N8N_USER_FOLDER` | Data directory |
+|-------------|--------------------------------------|----------------|
+| `/data` | `/data` | `/data/.n8n` |
+| `/home/node/.n8n` (default) | `/home/node` | `/home/node/.n8n` |
 
-derived from `main.persistence.mountPath` (e.g. `/data` → data at `/data/.n8n`, default `/home/node/.n8n` → parent `/home/node`).
-
-For Sandbox installs, keep:
+Do **not** set `HOME` / `N8N_USER_FOLDER` again in `extraEnvVars` (duplicate keys). For Sandbox use [`values-sandbox.yaml`](values-sandbox.yaml):
 
 ```yaml
 main:
   persistence:
+    existingClaim: n8n
     mountPath: "/data"
-  extraEnvVars:
-    N8N_USER_FOLDER: "/data"
-    HOME: "/data"
   config:
     n8n:
       user_folder: "/data"
@@ -1050,7 +1062,44 @@ This section outlines major updates and breaking changes for each version of the
 
 ---
 
-###  Version-Specific Upgrade Notes
+### Version-Specific Upgrade Notes
+
+#### Upgrading to Version 1.17.0 (n8n 2.32.7)
+
+##### Highlights
+
+- n8n application version: **1.123.28 → 2.32.7**
+- UBI image: `quay.io/maximilianopizarro/n8n:2.32.7`
+- OpenShift EACCES fix: chart injects `HOME` + `N8N_USER_FOLDER` from `main.persistence.mountPath`
+- Chart **1.16.0** remains in the Helm repo for existing catalog RC installs
+
+##### Action Required
+
+1. **Backup** SQLite/Postgres data before upgrading (2.x runs new migrations).
+2. For MCP / Code-node workflows, keep:
+
+```yaml
+main:
+  extraEnvVars:
+    NODE_FUNCTION_ALLOW_BUILTIN: "*"
+    NODE_FUNCTION_ALLOW_EXTERNAL: "*"
+```
+
+3. On OpenShift Sandbox, set `main.persistence.mountPath: "/data"` (see [`values-sandbox.yaml`](values-sandbox.yaml)). Do **not** also set `HOME` / `N8N_USER_FOLDER` in `extraEnvVars`.
+4. Expect a longer first boot after upgrade. A single liveness restart during migrations on small Sandbox nodes can occur; wait until Ready.
+
+##### Upgrade command
+
+```shell
+helm repo update
+helm upgrade n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml
+```
+
+##### Stay on n8n 1.x
+
+```shell
+helm upgrade n8n n8n-openshift/n8n --version 1.16.0
+```
 
 #### Upgrading to Version 1.13.1
 

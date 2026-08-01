@@ -510,29 +510,28 @@ graph LR
     <div class="step-number">3</div>
     <div class="step-content">
       <strong>Install on OpenShift Developer Sandbox</strong>
-      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br>helm install n8n n8n-openshift/n8n -f values-sandbox.yaml</div>
+      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br># Create PVC first (RWO, 2Gi)<br>oc apply -f - &lt;&lt;EOF<br>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>&nbsp;&nbsp;name: n8n<br>spec:<br>&nbsp;&nbsp;accessModes: [ReadWriteOnce]<br>&nbsp;&nbsp;resources:<br>&nbsp;&nbsp;&nbsp;&nbsp;requests:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;storage: 2Gi<br>EOF<br>helm install n8n n8n-openshift/n8n --version 1.17.0 \<br>&nbsp;&nbsp;-f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml</div>
     </div>
   </div>
 </div>
 
 <div class="section">
   <h2>Developer Sandbox Quick Start</h2>
-  <p>For Red Hat OpenShift Developer Sandbox, use these values to ensure compatibility with restricted SCCs:</p>
-  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.32.7"<br>&nbsp;&nbsp;variant: "ubi"<br><br>enableServiceLinks: false<br><br>podSecurityContext: {}<br>securityContext:<br>&nbsp;&nbsp;allowPrivilegeEscalation: false<br>&nbsp;&nbsp;capabilities:<br>&nbsp;&nbsp;&nbsp;&nbsp;drop:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ALL<br>&nbsp;&nbsp;readOnlyRootFilesystem: false<br>&nbsp;&nbsp;runAsNonRoot: true<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_USER_FOLDER: "/data"<br>&nbsp;&nbsp;&nbsp;&nbsp;HOME: "/data"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;storageClass: gp3-csi<br>&nbsp;&nbsp;&nbsp;&nbsp;size: 2Gi<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;podSecurityContext: {}<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
+  <p>For Red Hat OpenShift Developer Sandbox, use <a href="https://github.com/maximilianoPizarro/n8n-helm-chart/blob/main/values-sandbox.yaml"><code>values-sandbox.yaml</code></a>. Chart <strong>1.17.0+</strong> injects <code>HOME</code> and <code>N8N_USER_FOLDER</code> from <code>main.persistence.mountPath</code> — do <strong>not</strong> set them again in <code>extraEnvVars</code>.</p>
+  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.32.7"<br>&nbsp;&nbsp;variant: "ubi"<br><br>enableServiceLinks: false<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;existingClaim: n8n<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
 
   <table class="styled-table">
     <thead>
       <tr><th>Setting</th><th>Value</th><th>Reason</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>image.variant</code></td><td><code>ubi</code></td><td>Uses Red Hat UBI image with <code>curl</code> for workflow downloads</td></tr>
-      <tr><td><code>N8N_USER_FOLDER</code> / <code>HOME</code></td><td><code>/data</code></td><td>Prevents <code>EACCES mkdir '/.n8n'</code> with OpenShift random UIDs</td></tr>
-      <tr><td><code>enableServiceLinks</code></td><td><code>false</code></td><td>Avoids N8N_PORT env conflict in OpenShift</td></tr>
+      <tr><td><code>image.variant</code></td><td><code>ubi</code></td><td>Red Hat UBI image; initContainers use <code>curl</code> for workflow downloads</td></tr>
+      <tr><td><code>main.persistence.mountPath</code></td><td><code>/data</code></td><td>Chart injects <code>HOME</code> + <code>N8N_USER_FOLDER</code> from this path (prevents <code>EACCES mkdir '/.n8n'</code>)</td></tr>
+      <tr><td><code>main.config.n8n.user_folder</code></td><td><code>/data</code></td><td>ConfigMap backup for <code>N8N_USER_FOLDER</code></td></tr>
+      <tr><td><code>main.persistence.existingClaim</code></td><td><code>n8n</code></td><td>Use a pre-created RWO PVC (Sandbox-friendly)</td></tr>
+      <tr><td><code>enableServiceLinks</code></td><td><code>false</code></td><td>Avoids <code>N8N_PORT</code> env conflict in OpenShift</td></tr>
       <tr><td><code>route.sccRoleDisabled</code></td><td><code>true</code></td><td>Developer Sandbox users cannot create SCC Roles</td></tr>
-      <tr><td><code>main.config.n8n.user_folder</code></td><td><code>/data</code></td><td>Writable path for random UID assigned by OpenShift</td></tr>
-      <tr><td><code>main.persistence.mountPath</code></td><td><code>/data</code></td><td>Mount PVC at writable path instead of /home/node/.n8n</td></tr>
-      <tr><td><code>podSecurityContext</code></td><td><code>{}</code></td><td>No fsGroup (restricted SCC)</td></tr>
-      <tr><td><code>main.persistence.storageClass</code></td><td><code>gp3-csi</code></td><td>Sandbox default StorageClass</td></tr>
+      <tr><td><code>NODE_FUNCTION_ALLOW_BUILTIN</code></td><td><code>*</code></td><td>Required for MCP Code nodes (<code>require('http')</code>) on n8n 2.x</td></tr>
     </tbody>
   </table>
 </div>
@@ -787,20 +786,42 @@ graph LR
 
   <h3>v1.17.0 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 2.32.7)</span></h3>
 
+  <h4 style="color:var(--n8n-green);margin-top:20px;">Highlights</h4>
+  <ul>
+    <li>n8n upgraded to <strong>2.32.7</strong> (latest stable) with rebuilt UBI image <code>quay.io/maximilianopizarro/n8n:2.32.7</code></li>
+    <li>OpenShift <code>EACCES mkdir '/.n8n'</code> fixed for random UIDs</li>
+    <li>Published <a href="https://github.com/maximilianoPizarro/n8n-helm-chart/blob/main/values-sandbox.yaml"><code>values-sandbox.yaml</code></a> for Developer Sandbox installs</li>
+    <li>Chart <strong>1.16.0</strong> (n8n 1.123.28) kept in the Helm repo for existing catalog RC installs</li>
+  </ul>
+
   <h4 style="color:var(--n8n-blue);margin-top:20px;">Changed</h4>
   <ul>
-    <li>Updated n8n app version from <strong>1.123.28</strong> to <strong>2.32.7</strong> (latest stable)</li>
-    <li>UBI container image rebuilt for n8n 2.32.7 at <code>quay.io/maximilianopizarro/n8n:2.32.7</code></li>
+    <li>Updated n8n app version from <strong>1.123.28</strong> to <strong>2.32.7</strong></li>
+    <li>UBI <code>Containerfile</code> rebuilds sqlite3 dynamically for n8n 2.x package layouts</li>
+    <li>GitHub Pages / README updated for the 5-node MCP + AI pipeline and Sandbox install path</li>
   </ul>
 
   <h4 style="color:var(--n8n-primary);margin-top:20px;">Fixed</h4>
   <ul>
-    <li>Fixed <code>EACCES: permission denied, mkdir '/.n8n'</code> on OpenShift by always injecting <code>HOME</code> and <code>N8N_USER_FOLDER</code> from <code>main.persistence.mountPath</code> (covers random UID / <code>HOME=/</code> cases)</li>
+    <li>Fixed <code>EACCES: permission denied, mkdir '/.n8n'</code> on OpenShift — Deployment always injects <code>HOME</code> and <code>N8N_USER_FOLDER</code> derived from <code>main.persistence.mountPath</code> (e.g. <code>/data</code> → <code>/data/.n8n</code>)</li>
   </ul>
+
+  <h4 style="color:var(--n8n-muted);margin-top:20px;">Upgrade from chart 1.16.0 / n8n 1.123.28</h4>
+  <ul>
+    <li>Backup your SQLite/Postgres data before upgrading (n8n 2.x runs new DB migrations)</li>
+    <li>Set <code>NODE_FUNCTION_ALLOW_BUILTIN: "*"</code> (and usually <code>NODE_FUNCTION_ALLOW_EXTERNAL: "*"</code>) if you use Code nodes that call Node built-ins such as <code>http</code> — required for the MCP workflows</li>
+    <li>Prefer <code>main.persistence.mountPath: "/data"</code> on OpenShift; the chart injects the matching <code>HOME</code> / <code>N8N_USER_FOLDER</code> env vars</li>
+    <li>Do <strong>not</strong> duplicate <code>HOME</code> / <code>N8N_USER_FOLDER</code> in <code>extraEnvVars</code> (causes Kubernetes duplicate-env warnings)</li>
+    <li>First boot after upgrade can take longer (migrations). If the pod restarts once on liveness during cold start, wait for Ready — this is expected on resource-constrained Sandbox nodes</li>
+    <li>n8n 2.x may log task-runner / community-package deprecation notices; they are informational unless you rely on those defaults changing later</li>
+  </ul>
+  <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml</div>
 
   <h4 style="color:var(--n8n-muted);margin-top:20px;">Compatibility</h4>
   <ul>
-    <li>Chart <strong>1.16.0</strong> (n8n 1.123.28) remains available in the Helm repo / OpenShift catalog for existing RC deployments</li>
+    <li>Chart <strong>1.16.0</strong> (n8n 1.123.28) remains available: <code>helm install n8n n8n-openshift/n8n --version 1.16.0</code></li>
+    <li>Official image: <code>n8nio/n8n:2.32.7</code> with <code>image.variant: official</code></li>
+    <li>UBI image: <code>quay.io/maximilianopizarro/n8n:2.32.7</code> with <code>image.variant: ubi</code></li>
   </ul>
 
   <h3 style="margin-top:32px;">v1.16.0 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 1.123.28)</span></h3>
