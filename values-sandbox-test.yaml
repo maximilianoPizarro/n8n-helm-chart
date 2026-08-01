@@ -6,6 +6,9 @@ image:
 
 enableServiceLinks: false
 
+# Top-level pod/security contexts are chart defaults for non-OpenShift.
+# The deployment template reads main.podSecurityContext / main.securityContext
+# (unset here) so OpenShift restricted-v2 can assign a random UID.
 podSecurityContext: {}
 
 securityContext:
@@ -25,10 +28,10 @@ route:
   host: ""
 
 main:
+  # Leave main.securityContext / main.podSecurityContext unset for Sandbox SCC.
+  # HOME + N8N_USER_FOLDER are injected by the chart from persistence.mountPath.
   extraEnvVars:
     N8N_LISTEN_ADDRESS: "0.0.0.0"
-    N8N_USER_FOLDER: "/data"
-    HOME: "/data"
     NODE_FUNCTION_ALLOW_BUILTIN: "*"
     NODE_FUNCTION_ALLOW_EXTERNAL: "*"
   config:
