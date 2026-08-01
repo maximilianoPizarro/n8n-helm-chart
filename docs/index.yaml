@@ -3,6 +3,12 @@ entries:
   n8n:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: "Align values.schema.json with worker.enabled, webhook.enabled, and main.persistence.type for catalog validation"
+        - kind: fixed
+          description: "Fix dynamic PVC wiring (persistence.type + accessMode) and wire startupProbe on main/worker/webhook"
+        - kind: changed
+          description: "Tune main probes for OpenShift cold starts (startupProbe + longer liveness/readiness timeouts)"
         - kind: changed
           description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable). Chart 1.16.0 remains available for existing catalog RC installs"
         - kind: fixed
@@ -63,7 +69,110 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.32.7
-    created: "2026-08-01T13:13:22.7381793-03:00"
+    created: "2026-08-01T13:26:43.7419972-03:00"
+    dependencies:
+    - condition: valkey.enabled
+      name: valkey
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.4.7
+    description: Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift,
+      a fair-code workflow automation platform with native AI capabilities for technical
+      teams. Easily automate tasks across different services. Includes optional Mailpit
+      for email testing and OpenShift Developer Sandbox support.
+    digest: 6cd35d6d5e51f9549b39dc7a7c62cc78b141ec466d6e92a00b3a24f5681c41fa
+    home: https://maximilianopizarro.github.io/n8n-helm-chart/
+    icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
+    keywords:
+    - Workflow Automation
+    - Workflow
+    - iPaaS
+    - integration-framework
+    - low-code-plattform
+    - low-code
+    - openshift
+    - mcp-server
+    - ai-workflows
+    kubeVersion: '>=1.20.0'
+    maintainers:
+    - email: maximiliano.pizarro.5@gmail.com
+      name: maximilianoPizarro
+      url: https://github.com/maximilianoPizarro
+    - email: cestay@redhat.com
+      name: pkstaz
+      url: https://github.com/n8n-io
+    name: n8n
+    sources:
+    - https://github.com/maximilianoPizarro/n8n-helm-chart
+    - https://github.com/n8n-io/n8n
+    - https://n8n.io/
+    - https://github.com/maximilianoPizarro/openshift-mcp-server
+    type: application
+    urls:
+    - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.17.1.tgz
+    version: 1.17.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable). Chart 1.16.0 remains available for existing catalog RC installs"
+        - kind: fixed
+          description: "Fix EACCES permission denied mkdir '/.n8n' on OpenShift by always injecting HOME and N8N_USER_FOLDER from main.persistence.mountPath"
+        - kind: changed
+          description: "Document OpenShift Developer Sandbox install path and n8n 1.x to 2.x migration notes"
+        - kind: added
+          description: "Add 7 MCP Server workflows with real JSON-RPC tool calls + AI analysis via LiteLLM/Granite + Mailpit email reports"
+        - kind: added
+          description: "Add workflow auto-import via Deployment initContainers (download + n8n import:workflow)"
+        - kind: added
+          description: "Add Mailpit as optional SMTP test service with OpenShift Route support"
+        - kind: added
+          description: "Add enableServiceLinks for Developer Sandbox N8N_PORT env conflict resolution"
+        - kind: added
+          description: "Add route.sccRoleDisabled for Developer Sandbox RBAC compatibility"
+        - kind: added
+          description: "Add Red Hat UBI container image at quay.io/maximilianopizarro/n8n via GitHub Actions CI"
+        - kind: added
+          description: "Add Chart Verifier GitHub Actions workflow for Red Hat Community certification"
+        - kind: added
+          description: "Add configurable volume mount path (main.persistence.mountPath) for restricted environments"
+        - kind: added
+          description: "Add image.variant option (official/ubi) for selecting between Alpine wget and UBI curl in workflow auto-import initContainers"
+        - kind: added
+          description: "Add AI Format & Explain pipeline step to all 7 MCP workflows via LiteLLM/Granite with health assessments"
+        - kind: changed
+          description: "Redesign GitHub Pages documentation with MCP pipeline architecture, lightbox viewer, and Mermaid diagrams"
+        - kind: fixed
+          description: "Fix ClusterIP_ typo in service template"
+        - kind: fixed
+          description: "Fix hardcoded names in role.yaml to use chart naming helpers (supports n8n-dev-east style release names)"
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://maximilianopizarro.github.io/n8n-helm-chart/
+        - name: OpenShift MCP Server
+          url: https://maximilianopizarro.github.io/openshift-mcp-server
+        - name: OpenShift MCP Server (Artifact Hub)
+          url: https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server
+        - name: n8n Sandbox Workflows
+          url: https://github.com/maximilianoPizarro/n8n-sandbox
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/openshift-mcp-server/openshift-mcp-server
+      artifacthub.io/screenshots: |
+        - title: Mailpit Inbox - Workflow Email Reports
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mailpit-inbox.png
+        - title: Pod Status Report - Red Hat Branded HTML Email
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mailpit-email-detail.png
+        - title: MCP Inspector - monitorDeployments Verification
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/mcp-inspector-monitor-deployments.png
+        - title: n8n All Workflows List
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-all-workflows-list.png
+        - title: n8n Dashboard
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-dashboard.png
+        - title: n8n via Podman - Red Hat UBI 9 Container
+          url: https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/docs/screenshots/n8n-podman-welcome.png
+      charts.openshift.io/name: n8n
+    apiVersion: v2
+    appVersion: 2.32.7
+    created: "2026-08-01T13:26:43.7294862-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -162,7 +271,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.123.28
-    created: "2026-08-01T13:13:22.7256712-03:00"
+    created: "2026-08-01T13:26:43.7174622-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -211,7 +320,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2026-08-01T13:13:22.7136214-03:00"
+    created: "2026-08-01T13:26:43.7048156-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -247,4 +356,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2026-08-01T13:13:22.7014868-03:00"
+generated: "2026-08-01T13:26:43.6916461-03:00"

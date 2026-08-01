@@ -12,7 +12,7 @@
 
 [n8n](https://github.com/n8n-io/n8n) is an extendable workflow automation tool. This Helm chart deploys n8n on **Kubernetes** and **Red Hat OpenShift** with native MCP Server integration, Developer Sandbox support, Mailpit email testing, and workflow auto-import.
 
-## Key Features (v1.17.0)
+## Key Features (v1.17.1)
 
 - **n8n 2.32.7** — Upgraded from 1.123.28; chart 1.16.0 remains available for existing catalog RC installs
 - **OpenShift EACCES fix** — Always injects `HOME` and `N8N_USER_FOLDER` from `main.persistence.mountPath` to prevent `mkdir '/.n8n'` failures under random UIDs
@@ -80,14 +80,14 @@ helm repo add n8n-openshift https://maximilianopizarro.github.io/n8n-helm-chart/
 ```
 
 ```shell
-helm install n8n n8n-openshift/n8n --version 1.17.0
+helm install n8n n8n-openshift/n8n --version 1.17.1
 ```
 
 ### OpenShift Developer Sandbox
 
 ```shell
 # Create PVC (RWO 2Gi) named "n8n", then:
-helm install n8n n8n-openshift/n8n --version 1.17.0 \
+helm install n8n n8n-openshift/n8n --version 1.17.1 \
   -f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml
 ```
 
@@ -1064,7 +1064,7 @@ This section outlines major updates and breaking changes for each version of the
 
 ### Version-Specific Upgrade Notes
 
-#### Upgrading to Version 1.17.0 (n8n 2.32.7)
+#### Upgrading to Version 1.17.1 (n8n 2.32.7)
 
 ##### Highlights
 
@@ -1092,7 +1092,7 @@ main:
 
 ```shell
 helm repo update
-helm upgrade n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml
+helm upgrade n8n n8n-openshift/n8n --version 1.17.1 -f values-sandbox.yaml
 ```
 
 ##### Stay on n8n 1.x

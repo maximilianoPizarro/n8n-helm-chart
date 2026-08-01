@@ -25,9 +25,8 @@
 container/
 # GitHub Actions
 .github/
-# Sandbox / test values (shipped via GitHub, not inside the chart package)
+# Sandbox values (shipped via GitHub, not inside the chart package)
 values-sandbox.yaml
-values-sandbox-test.yaml
 # Documentation (GitHub Pages)
 docs/screenshots/
 docs/*.tgz

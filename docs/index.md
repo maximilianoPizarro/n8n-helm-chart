@@ -503,14 +503,14 @@ graph LR
     <div class="step-number">2</div>
     <div class="step-content">
       <strong>Install the chart</strong>
-      <div class="code-block">helm install n8n n8n-openshift/n8n --version 1.17.0</div>
+      <div class="code-block">helm install n8n n8n-openshift/n8n --version 1.17.1</div>
     </div>
   </div>
   <div class="install-step">
     <div class="step-number">3</div>
     <div class="step-content">
       <strong>Install on OpenShift Developer Sandbox</strong>
-      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br># Create PVC first (RWO, 2Gi)<br>oc apply -f - &lt;&lt;EOF<br>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>&nbsp;&nbsp;name: n8n<br>spec:<br>&nbsp;&nbsp;accessModes: [ReadWriteOnce]<br>&nbsp;&nbsp;resources:<br>&nbsp;&nbsp;&nbsp;&nbsp;requests:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;storage: 2Gi<br>EOF<br>helm install n8n n8n-openshift/n8n --version 1.17.0 \<br>&nbsp;&nbsp;-f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml</div>
+      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br># Create PVC first (RWO, 2Gi)<br>oc apply -f - &lt;&lt;EOF<br>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>&nbsp;&nbsp;name: n8n<br>spec:<br>&nbsp;&nbsp;accessModes: [ReadWriteOnce]<br>&nbsp;&nbsp;resources:<br>&nbsp;&nbsp;&nbsp;&nbsp;requests:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;storage: 2Gi<br>EOF<br>helm install n8n n8n-openshift/n8n --version 1.17.1 \<br>&nbsp;&nbsp;-f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml</div>
     </div>
   </div>
 </div>
@@ -784,6 +784,18 @@ graph LR
 <div class="section">
   <h2>Release Notes</h2>
 
+  <h3>v1.17.1 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 2.32.7)</span></h3>
+  <h4 style="color:var(--n8n-primary);margin-top:20px;">Fixed</h4>
+  <ul>
+    <li>Aligned <code>values.schema.json</code> with <code>worker.enabled</code>, <code>webhook.enabled</code>, and <code>main.persistence.type</code></li>
+    <li>Fixed dynamic PVC wiring (<code>persistence.type</code> + <code>accessMode</code>) and wired <code>startupProbe</code> on main/worker/webhook</li>
+  </ul>
+  <h4 style="color:var(--n8n-primary);margin-top:20px;">Changed</h4>
+  <ul>
+    <li>Tuned main probes for OpenShift cold starts (startupProbe + longer liveness/readiness timeouts)</li>
+    <li>Single Sandbox overlay: <code>values-sandbox.yaml</code></li>
+  </ul>
+
   <h3>v1.17.0 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 2.32.7)</span></h3>
 
   <h4 style="color:var(--n8n-green);margin-top:20px;">Highlights</h4>
@@ -815,7 +827,7 @@ graph LR
     <li>First boot after upgrade can take longer (migrations). If the pod restarts once on liveness during cold start, wait for Ready — this is expected on resource-constrained Sandbox nodes</li>
     <li>n8n 2.x may log task-runner / community-package deprecation notices; they are informational unless you rely on those defaults changing later</li>
   </ul>
-  <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml</div>
+  <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.17.1 -f values-sandbox.yaml</div>
 
   <h4 style="color:var(--n8n-muted);margin-top:20px;">Compatibility</h4>
   <ul>
@@ -857,7 +869,7 @@ graph LR
   </div>
 
   <h3 style="margin-top:32px;">Upgrade</h3>
-  <div class="code-block">helm repo update<br>helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.17.0</div>
+  <div class="code-block">helm repo update<br>helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.17.1</div>
   <h3>Uninstall</h3>
   <div class="code-block">helm uninstall [RELEASE_NAME]</div>
 </div>

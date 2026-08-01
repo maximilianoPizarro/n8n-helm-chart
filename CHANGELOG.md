@@ -4,6 +4,23 @@ This file documents all notable changes to the [n8n-helm-chart](https://github.c
 
 Also see GitHub Releases: https://github.com/maximilianoPizarro/n8n-helm-chart/releases
 
+## [1.17.1] — 2026-08-01
+
+### Fixed
+
+- `values.schema.json`: allow `worker.enabled`, `webhook.enabled`, and `main.persistence.type`
+- Dynamic PVC path: honor `persistence.type` / `existingClaim` and use `accessMode` when `accessModes` is unset
+- Wire `startupProbe` on main, worker, and webhook Deployments
+
+### Changed
+
+- Main probes tuned for OpenShift cold starts (`startupProbe` ~3 min budget; longer liveness/readiness timeouts)
+- Consolidate Sandbox overlay to a single [`values-sandbox.yaml`](values-sandbox.yaml)
+
+```shell
+helm upgrade n8n n8n-openshift/n8n --version 1.17.1 -f values-sandbox.yaml
+```
+
 ## [1.17.0] — 2026-08-01
 
 ### Highlights
@@ -32,7 +49,7 @@ Also see GitHub Releases: https://github.com/maximilianoPizarro/n8n-helm-chart/r
 
 ```shell
 helm repo update
-helm upgrade n8n n8n-openshift/n8n --version 1.17.0 -f values-sandbox.yaml
+helm upgrade n8n n8n-openshift/n8n --version 1.17.1 -f values-sandbox.yaml
 ```
 
 To stay on n8n 1.123.28:

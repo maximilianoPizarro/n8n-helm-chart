@@ -1,6 +1,6 @@
 apiVersion: v2
 name: n8n
-version: 1.17.0
+version: 1.17.1
 appVersion: 2.32.7
 kubeVersion: ">=1.20.0"
 type: application
@@ -40,6 +40,12 @@ annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "Align values.schema.json with worker.enabled, webhook.enabled, and main.persistence.type for catalog validation"
+    - kind: fixed
+      description: "Fix dynamic PVC wiring (persistence.type + accessMode) and wire startupProbe on main/worker/webhook"
+    - kind: changed
+      description: "Tune main probes for OpenShift cold starts (startupProbe + longer liveness/readiness timeouts)"
     - kind: changed
       description: "Update n8n app version from 1.123.28 to 2.32.7 (latest stable). Chart 1.16.0 remains available for existing catalog RC installs"
     - kind: fixed

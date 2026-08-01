@@ -62,12 +62,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/* PVC existing, emptyDir, Dynamic */}}
 {{- define "n8n.pvc" -}}
-{{- if or (not .Values.main.persistence.enabled) (eq .Values.main.persistence.type "emptyDir") -}}
+{{- $type := default "emptyDir" .Values.main.persistence.type -}}
+{{- if or (not .Values.main.persistence.enabled) (eq $type "emptyDir") -}}
           emptyDir: {}
-{{- else if and .Values.main.persistence.enabled .Values.main.persistence.existingClaim -}}
+{{- else if .Values.main.persistence.existingClaim -}}
           persistentVolumeClaim:
             claimName: {{ .Values.main.persistence.existingClaim }}
-{{- else if and .Values.main.persistence.enabled (eq .Values.main.persistence.type "dynamic")  -}}
+{{- else if or (eq $type "dynamic") (eq $type "existing") -}}
+          persistentVolumeClaim:
+            claimName: {{ include "n8n.fullname" . }}
+{{- else -}}
           persistentVolumeClaim:
             claimName: {{ include "n8n.fullname" . }}
 {{- end }}
