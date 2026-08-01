@@ -5,42 +5,61 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   release:
-    permissions:
-      contents: write
+    name: Package and publish chart
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses:  actions/checkout@v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
         uses: azure/setup-helm@v4
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # see https://github.com/helm/chart-releaser/issues/183
-      - name: Login to 8gears.container-registry.com
-        uses: docker/login-action@v3
-        with:
-          registry: 8gears.container-registry.com
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Resolve chart version
+        id: chart
+        run: |
+          VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}' | tr -d '"')
+          TAG="${GITHUB_REF_NAME}"
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "TAG=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Chart.yaml version=${VERSION} tag=${TAG}"
 
-      - name: Generate values schema json
-        uses: losisin/helm-values-schema-json-action@v1
-        with:
-          input: charts/n8n/values.yaml
-          # "Skip copying the schema values file for now, as it needs more testing."
-      - name: Push charts to 8gears.container-registry.com
-        run: |          
-          cp -a README.md LICENSE charts/n8n/
-          package_path=$(helm package charts/n8n --dependency-update | grep -o '/.*\.tgz')
-          helm push "${package_path}" "oci://8gears.container-registry.com/library"
+      - name: Package chart
+        run: |
+          helm dependency update .
+          mkdir -p dist
+          helm package . -d dist/
+          ls -la "dist/n8n-${{ steps.chart.outputs.VERSION }}.tgz"
+
+      - name: Publish GitHub Release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.chart.outputs.TAG }}"
+          VERSION="${{ steps.chart.outputs.VERSION }}"
+          TGZ="dist/n8n-${VERSION}.tgz"
+          REPORT="docs/chart-verifier-report-${VERSION}.yaml"
+
+          ASSETS=("$TGZ")
+          if [ -f "$REPORT" ]; then
+            ASSETS+=("$REPORT")
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "${ASSETS[@]}" --clobber
+            echo "Updated assets on existing release ${TAG}"
+          else
+            gh release create "$TAG" "${ASSETS[@]}" \
+              --title "$TAG" \
+              --generate-notes \
+              --latest
+            echo "Created release ${TAG}"
+          fi
