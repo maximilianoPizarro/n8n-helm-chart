@@ -1,7 +1,7 @@
 apiVersion: v2
 name: n8n
-version: 1.17.1
-appVersion: 2.32.7
+version: 1.18.0
+appVersion: 2.36.7
 kubeVersion: ">=1.20.0"
 type: application
 description: "Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift, a fair-code workflow automation platform with native AI capabilities for technical teams. Easily automate tasks across different services. Includes optional Mailpit for email testing and OpenShift Developer Sandbox support."
@@ -40,6 +40,10 @@ annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
+    - kind: changed
+      description: "Update n8n app version from 2.32.7 to 2.36.7 (latest stable)"
+    - kind: fixed
+      description: "Fix OpenShift EACCES mkdir '/home/node/.cache' by setting HOME/N8N_USER_FOLDER/XDG_CACHE_HOME to the writable persistence mountPath (do not strip /.n8n)"
     - kind: fixed
       description: "Align values.schema.json with worker.enabled, webhook.enabled, and main.persistence.type for catalog validation"
     - kind: fixed

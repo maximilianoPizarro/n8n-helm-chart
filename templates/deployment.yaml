@@ -93,15 +93,14 @@ spec:
                 name: {{ include "n8n.fullname" . }}-app-config
             {{- end }}
           env:
+            {{- /* HOME must be the writable volume mount (OpenShift random UID cannot write /home/node). */}}
             {{- $mountPath := .Values.main.persistence.mountPath | default "/home/node/.n8n" }}
-            {{- $userFolder := $mountPath }}
-            {{- if hasSuffix "/.n8n" $mountPath }}
-            {{- $userFolder = trimSuffix "/.n8n" $mountPath }}
-            {{- end }}
             - name: HOME
-              value: {{ $userFolder | quote }}
+              value: {{ $mountPath | quote }}
             - name: N8N_USER_FOLDER
-              value: {{ $userFolder | quote }}
+              value: {{ $mountPath | quote }}
+            - name: XDG_CACHE_HOME
+              value: {{ printf "%s/.cache" $mountPath | quote }}
             {{- range $key, $value := .Values.main.extraEnvVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -136,15 +135,14 @@ spec:
                 name: {{ include "n8n.fullname" . }}-app-secret
             {{- end }}
           env:
+            {{- /* HOME must be the writable volume mount (OpenShift random UID cannot write /home/node). */}}
             {{- $mountPath := .Values.main.persistence.mountPath | default "/home/node/.n8n" }}
-            {{- $userFolder := $mountPath }}
-            {{- if hasSuffix "/.n8n" $mountPath }}
-            {{- $userFolder = trimSuffix "/.n8n" $mountPath }}
-            {{- end }}
             - name: HOME
-              value: {{ $userFolder | quote }}
+              value: {{ $mountPath | quote }}
             - name: N8N_USER_FOLDER
-              value: {{ $userFolder | quote }}
+              value: {{ $mountPath | quote }}
+            - name: XDG_CACHE_HOME
+              value: {{ printf "%s/.cache" $mountPath | quote }}
             {{- range $key, $value := .Values.main.extraEnvVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}

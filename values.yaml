@@ -278,8 +278,8 @@ license:
 route:
   enabled: true
   # -- Disable the anyuid SCC Role/RoleBinding creation (required for Developer Sandbox where SCC grants are not allowed)
-  sccRoleDisabled: false
-  host: n8n-n8n.apps.rosa.cmzih-zqhto-9xr.zxi0.p3.openshiftapps.com
+  sccRoleDisabled: true
+  host: ""
   tls:
     termination: edge
   annotations: {}
@@ -363,7 +363,7 @@ main:
     volumeName: ""
     # -- Existing claim to use for persistence
     existingClaim: ""
-    # -- Mount path for persistence
+    # -- Mount path for persistence (also used as HOME / N8N_USER_FOLDER for OpenShift random UIDs)
     mountPath: "/home/node/.n8n"
     # -- Sub path for persistence
     subPath: ""

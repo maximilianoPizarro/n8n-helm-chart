@@ -1,4 +1,4 @@
-ARG N8N_VERSION=2.32.7
+ARG N8N_VERSION=2.36.7
 
 # Stage 1: Source - extract n8n from official Docker Hub image
 FROM docker.io/n8nio/n8n:${N8N_VERSION} AS source
@@ -21,7 +21,7 @@ RUN SQLITE3_DIR=$(find /usr/local/lib/node_modules/n8n/node_modules/.pnpm -type 
 # Stage 3: Runtime - minimal UBI image
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
 
-ARG N8N_VERSION=2.32.7
+ARG N8N_VERSION=2.36.7
 
 LABEL name="n8n" \
       vendor="n8n GmbH" \

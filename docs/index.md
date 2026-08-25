@@ -485,7 +485,7 @@ graph LR
   <div class="screenshot-grid" style="grid-template-columns: 1fr;">
     <div class="screenshot-card">
       <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with Red Hat UBI 9 image">
-      <div class="caption">n8n 2.32.7 via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9 + Node.js 22)</div>
+      <div class="caption">n8n 2.36.7 via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9 + Node.js 22)</div>
     </div>
   </div>
 </div>
@@ -503,22 +503,22 @@ graph LR
     <div class="step-number">2</div>
     <div class="step-content">
       <strong>Install the chart</strong>
-      <div class="code-block">helm install n8n n8n-openshift/n8n --version 1.17.1</div>
+      <div class="code-block">helm install n8n n8n-openshift/n8n --version 1.18.0</div>
     </div>
   </div>
   <div class="install-step">
     <div class="step-number">3</div>
     <div class="step-content">
       <strong>Install on OpenShift Developer Sandbox</strong>
-      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br># Create PVC first (RWO, 2Gi)<br>oc apply -f - &lt;&lt;EOF<br>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>&nbsp;&nbsp;name: n8n<br>spec:<br>&nbsp;&nbsp;accessModes: [ReadWriteOnce]<br>&nbsp;&nbsp;resources:<br>&nbsp;&nbsp;&nbsp;&nbsp;requests:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;storage: 2Gi<br>EOF<br>helm install n8n n8n-openshift/n8n --version 1.17.1 \<br>&nbsp;&nbsp;-f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml</div>
+      <div class="code-block">oc login --token=&lt;your-token&gt; --server=https://api.&lt;cluster&gt;.openshiftapps.com:6443<br># Create PVC first (RWO, 2Gi)<br>oc apply -f - &lt;&lt;EOF<br>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>&nbsp;&nbsp;name: n8n<br>spec:<br>&nbsp;&nbsp;accessModes: [ReadWriteOnce]<br>&nbsp;&nbsp;resources:<br>&nbsp;&nbsp;&nbsp;&nbsp;requests:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;storage: 2Gi<br>EOF<br>helm install n8n n8n-openshift/n8n --version 1.18.0 \<br>&nbsp;&nbsp;-f https://raw.githubusercontent.com/maximilianoPizarro/n8n-helm-chart/main/values-sandbox.yaml</div>
     </div>
   </div>
 </div>
 
 <div class="section">
   <h2>Developer Sandbox Quick Start</h2>
-  <p>For Red Hat OpenShift Developer Sandbox, use <a href="https://github.com/maximilianoPizarro/n8n-helm-chart/blob/main/values-sandbox.yaml"><code>values-sandbox.yaml</code></a>. Chart <strong>1.17.0+</strong> injects <code>HOME</code> and <code>N8N_USER_FOLDER</code> from <code>main.persistence.mountPath</code> — do <strong>not</strong> set them again in <code>extraEnvVars</code>.</p>
-  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.32.7"<br>&nbsp;&nbsp;variant: "ubi"<br><br>enableServiceLinks: false<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;existingClaim: n8n<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
+  <p>For Red Hat OpenShift Developer Sandbox, use <a href="https://github.com/maximilianoPizarro/n8n-helm-chart/blob/main/values-sandbox.yaml"><code>values-sandbox.yaml</code></a>. Chart <strong>1.18.0+</strong> injects <code>HOME</code>, <code>N8N_USER_FOLDER</code>, and <code>XDG_CACHE_HOME</code> from <code>main.persistence.mountPath</code> — do <strong>not</strong> set them again in <code>extraEnvVars</code>.</p>
+  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.36.7"<br>&nbsp;&nbsp;variant: "ubi"<br><br>enableServiceLinks: false<br><br>route:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;sccRoleDisabled: true<br><br>main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_LISTEN_ADDRESS: "0.0.0.0"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_BUILTIN: "*"<br>&nbsp;&nbsp;&nbsp;&nbsp;NODE_FUNCTION_ALLOW_EXTERNAL: "*"<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_folder: "/data"<br>&nbsp;&nbsp;persistence:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;&nbsp;&nbsp;existingClaim: n8n<br>&nbsp;&nbsp;&nbsp;&nbsp;mountPath: "/data"<br>&nbsp;&nbsp;service:<br>&nbsp;&nbsp;&nbsp;&nbsp;type: ClusterIP<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 5678<br><br>mailpit:<br>&nbsp;&nbsp;enabled: true<br>&nbsp;&nbsp;route:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true<br><br>workflows:<br>&nbsp;&nbsp;autoImport:<br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: true</div>
 
   <table class="styled-table">
     <thead>
@@ -716,7 +716,7 @@ graph LR
 <div class="section">
   <h2>Container Image</h2>
   <p>A Red Hat UBI 9-based container image is available at <code>quay.io/maximilianopizarro/n8n</code>. It uses a <strong>3-stage build</strong> that extracts n8n from the official Docker Hub image, rebuilds native modules (sqlite3) for Node.js 22 + glibc, and packages everything on <code>registry.access.redhat.com/ubi9/nodejs-22-minimal</code>.</p>
-  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.32.7"</div>
+  <div class="code-block">image:<br>&nbsp;&nbsp;repository: quay.io/maximilianopizarro/n8n<br>&nbsp;&nbsp;tag: "2.36.7"</div>
   <p>The image is built automatically via GitHub Actions on every push to <code>main</code> and published to <a href="https://quay.io/repository/maximilianopizarro/n8n">Quay.io</a>.</p>
 
   <h3>Build &amp; Run Locally with Podman</h3>
@@ -725,22 +725,22 @@ graph LR
   <div class="screenshot-grid" style="grid-template-columns: 1fr;">
     <div class="screenshot-card">
       <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with UBI 9 image from Quay.io">
-      <div class="caption">n8n 2.32.7 running locally via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9)</div>
+      <div class="caption">n8n 2.36.7 running locally via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9)</div>
     </div>
   </div>
 
   <h4>Build the image</h4>
-  <div class="code-block">podman build -t quay.io/maximilianopizarro/n8n:2.32.7 \<br>&nbsp;&nbsp;-f container/Containerfile \<br>&nbsp;&nbsp;--build-arg N8N_VERSION=2.32.7 .</div>
+  <div class="code-block">podman build -t quay.io/maximilianopizarro/n8n:2.36.7 \<br>&nbsp;&nbsp;-f container/Containerfile \<br>&nbsp;&nbsp;--build-arg N8N_VERSION=2.36.7 .</div>
 
   <h4>Run n8n</h4>
-  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.32.7</div>
+  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.36.7</div>
   <p>Open <a href="http://localhost:5678">http://localhost:5678</a> in your browser to access the n8n editor.</p>
 
   <h4>Run with pre-built image from Quay.io</h4>
-  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.32.7</div>
+  <div class="code-block">podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.36.7</div>
 
   <h4>Run with Mailpit for email testing</h4>
-  <div class="code-block"><span style="color:#6b7280;"># Start Mailpit (SMTP on 1025, Web UI on 8025)</span><br>podman run -d --name mailpit \<br>&nbsp;&nbsp;-p 8025:8025 -p 1025:1025 \<br>&nbsp;&nbsp;docker.io/axllent/mailpit:latest<br><br><span style="color:#6b7280;"># Start n8n connected to Mailpit</span><br>podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_BUILTIN="*" \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_EXTERNAL="*" \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.32.7</div>
+  <div class="code-block"><span style="color:#6b7280;"># Start Mailpit (SMTP on 1025, Web UI on 8025)</span><br>podman run -d --name mailpit \<br>&nbsp;&nbsp;-p 8025:8025 -p 1025:1025 \<br>&nbsp;&nbsp;docker.io/axllent/mailpit:latest<br><br><span style="color:#6b7280;"># Start n8n connected to Mailpit</span><br>podman run -d --name n8n \<br>&nbsp;&nbsp;-p 5678:5678 \<br>&nbsp;&nbsp;-v n8n-data:/data \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_BUILTIN="*" \<br>&nbsp;&nbsp;-e NODE_FUNCTION_ALLOW_EXTERNAL="*" \<br>&nbsp;&nbsp;quay.io/maximilianopizarro/n8n:2.36.7</div>
   <p>Access Mailpit at <a href="http://localhost:8025">http://localhost:8025</a> to view captured emails.</p>
 
   <h4>Useful commands</h4>
@@ -751,7 +751,7 @@ graph LR
       <tr><th>Build Stage</th><th>Base Image</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-      <tr><td>1. Source</td><td><code>n8nio/n8n:2.32.7</code></td><td>Extract n8n node_modules</td></tr>
+      <tr><td>1. Source</td><td><code>n8nio/n8n:2.36.7</code></td><td>Extract n8n node_modules</td></tr>
       <tr><td>2. Builder</td><td><code>ubi9/nodejs-22</code></td><td>Rebuild sqlite3 native module for Node.js 22 + glibc</td></tr>
       <tr><td>3. Runtime</td><td><code>ubi9/nodejs-22-minimal</code></td><td>Minimal production image (~350MB)</td></tr>
     </tbody>
@@ -783,6 +783,16 @@ graph LR
 
 <div class="section">
   <h2>Release Notes</h2>
+
+  <h3>v1.18.0 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 2.36.7)</span></h3>
+  <h4 style="color:var(--n8n-green);margin-top:20px;">Highlights</h4>
+  <ul>
+    <li>n8n upgraded to <strong>2.36.7</strong> (latest stable) with rebuilt UBI image <code>quay.io/maximilianopizarro/n8n:2.36.7</code></li>
+    <li>Fixed catalog/Sandbox CrashLoop <code>EACCES mkdir '/home/node/.cache'</code> — <code>HOME</code>/<code>N8N_USER_FOLDER</code>/<code>XDG_CACHE_HOME</code> use the writable mount path (no parent strip)</li>
+    <li>Default <code>route.sccRoleDisabled: true</code> for Developer Sandbox-friendly catalog installs</li>
+    <li>Charts <strong>1.17.1</strong> / <strong>1.16.0</strong> remain available for existing catalog RC installs</li>
+  </ul>
+  <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml</div>
 
   <h3>v1.17.1 <span style="font-size:13px;color:var(--n8n-muted);font-weight:400;">(n8n 2.32.7)</span></h3>
   <h4 style="color:var(--n8n-primary);margin-top:20px;">Fixed</h4>
@@ -869,7 +879,7 @@ graph LR
   </div>
 
   <h3 style="margin-top:32px;">Upgrade</h3>
-  <div class="code-block">helm repo update<br>helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.17.1</div>
+  <div class="code-block">helm repo update<br>helm upgrade [RELEASE_NAME] n8n-openshift/n8n --version 1.18.0</div>
   <h3>Uninstall</h3>
   <div class="code-block">helm uninstall [RELEASE_NAME]</div>
 </div>

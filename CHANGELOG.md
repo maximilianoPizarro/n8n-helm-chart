@@ -4,7 +4,29 @@ This file documents all notable changes to the [n8n-helm-chart](https://github.c
 
 Also see GitHub Releases: https://github.com/maximilianoPizarro/n8n-helm-chart/releases
 
+## [1.18.0] — 2026-08-25
+
+### Highlights
+
+- Upgrade n8n from **2.32.7** to **2.36.7** (latest stable)
+- Fix catalog/Sandbox CrashLoop: `EACCES mkdir '/home/node/.cache'`
+
+### Fixed
+
+- Set `HOME`, `N8N_USER_FOLDER`, and `XDG_CACHE_HOME` to the writable `main.persistence.mountPath` (no longer strip `/.n8n`, which left `HOME=/home/node` unwritable under OpenShift random UIDs)
+- Default `route.sccRoleDisabled: true` for Developer Sandbox-friendly installs from the catalog
+
+### Changed
+
+- UBI image / CI default target n8n **2.36.7**
+- Chart **1.17.1** / **1.16.0** remain available for existing catalog RC installs
+
+```shell
+helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml
+```
+
 ## [1.17.1] — 2026-08-01
+
 
 ### Fixed
 

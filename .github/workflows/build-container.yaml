@@ -11,7 +11,7 @@ on:
       n8n_version:
         description: 'n8n version to build'
         required: false
-        default: '2.32.7'
+        default: '2.36.7'
 
 env:
   REGISTRY: quay.io
@@ -19,10 +19,10 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set n8n version
         id: version
@@ -35,21 +35,21 @@ jobs:
           fi
 
       - name: Log in to Red Hat Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry.redhat.io
           username: ${{ secrets.REDHAT_REGISTRY_USERNAME }}
           password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
 
       - name: Log in to Quay.io
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Build container image
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@v3
         id: build
         with:
           image: ${{ env.IMAGE_NAME }}
@@ -62,7 +62,7 @@ jobs:
             N8N_VERSION=${{ steps.version.outputs.N8N_VERSION }}
 
       - name: Push to Quay.io
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           image: ${{ steps.build.outputs.image }}
           tags: ${{ steps.build.outputs.tags }}
