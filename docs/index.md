@@ -555,11 +555,11 @@ graph LR
 
 <div class="section" id="screenshots">
   <h2>Screenshots</h2>
-  <p>Browse the product tour — workflows, Mailpit, MCP Inspector, and local Podman. Use arrows, dots, or swipe; press <kbd>F</kbd> for fullscreen.</p>
+  <p>Browse the product tour — MCP workflows, Mailpit, and Inspector. Use arrows, dots, or swipe; press <kbd>F</kbd> for fullscreen.</p>
 
   <div class="shot-carousel" role="region" aria-roledescription="carousel" aria-label="n8n product screenshots" tabindex="0">
     <div class="shot-viewport">
-      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 14">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 13">
         <img src="screenshots/n8n-all-workflows-list.png" alt="All OpenShift MCP Workflows">
         <figcaption>
           <span class="slide-num">01 · Workflows</span>
@@ -567,7 +567,7 @@ graph LR
           <span class="desc">n8n with the OpenShift MCP Server workflow pack ready to run.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 14" hidden>
+      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 13" hidden>
         <img src="screenshots/n8n-editor-openshift-pod-monitor-ai-agent-mcp-tools.png" alt="Pod Monitor AI Agent with MCP Tools">
         <figcaption>
           <span class="slide-num">02 · Editor</span>
@@ -575,7 +575,7 @@ graph LR
           <span class="desc">Agent node wired to OpenShift MCP tools for live cluster queries.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="2" role="group" aria-roledescription="slide" aria-label="3 of 14" hidden>
+      <figure class="shot-slide" data-slide="2" role="group" aria-roledescription="slide" aria-label="3 of 13" hidden>
         <img src="screenshots/n8n-editor-openshift-pod-monitor-mcp-granite-email.png" alt="Pod Monitor MCP + Granite + Email">
         <figcaption>
           <span class="slide-num">03 · Editor</span>
@@ -583,7 +583,7 @@ graph LR
           <span class="desc">MCP call → LiteLLM/Granite analysis → branded HTML email via Mailpit.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="3" role="group" aria-roledescription="slide" aria-label="4 of 14" hidden>
+      <figure class="shot-slide" data-slide="3" role="group" aria-roledescription="slide" aria-label="4 of 13" hidden>
         <img src="screenshots/n8n-editor-deployment-rollout-status.png" alt="Deployment Rollout Status">
         <figcaption>
           <span class="slide-num">04 · Editor</span>
@@ -591,7 +591,7 @@ graph LR
           <span class="desc">Track rollout health and surface issues before they hit production.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="4" role="group" aria-roledescription="slide" aria-label="5 of 14" hidden>
+      <figure class="shot-slide" data-slide="4" role="group" aria-roledescription="slide" aria-label="5 of 13" hidden>
         <img src="screenshots/n8n-editor-resource-quota-monitor.png" alt="Resource Quota Monitor">
         <figcaption>
           <span class="slide-num">05 · Editor</span>
@@ -599,7 +599,7 @@ graph LR
           <span class="desc">Watch namespace quotas and alert when usage approaches limits.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="5" role="group" aria-roledescription="slide" aria-label="6 of 14" hidden>
+      <figure class="shot-slide" data-slide="5" role="group" aria-roledescription="slide" aria-label="6 of 13" hidden>
         <img src="screenshots/n8n-editor-security-audit.png" alt="Security Audit">
         <figcaption>
           <span class="slide-num">06 · Editor</span>
@@ -607,7 +607,7 @@ graph LR
           <span class="desc">Scan cluster posture and summarize findings with the LLM.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="6" role="group" aria-roledescription="slide" aria-label="7 of 14" hidden>
+      <figure class="shot-slide" data-slide="6" role="group" aria-roledescription="slide" aria-label="7 of 13" hidden>
         <img src="screenshots/n8n-editor-route-tls-expiry.png" alt="Route TLS Expiry Check">
         <figcaption>
           <span class="slide-num">07 · Editor</span>
@@ -615,7 +615,7 @@ graph LR
           <span class="desc">Detect expiring certificates on OpenShift Routes before outages.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="7" role="group" aria-roledescription="slide" aria-label="8 of 14" hidden>
+      <figure class="shot-slide" data-slide="7" role="group" aria-roledescription="slide" aria-label="8 of 13" hidden>
         <img src="screenshots/n8n-editor-event-anomaly-detector.png" alt="Event Anomaly Detector">
         <figcaption>
           <span class="slide-num">08 · Editor</span>
@@ -623,7 +623,7 @@ graph LR
           <span class="desc">Correlated Kubernetes events with AI explanation in the email report.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="8" role="group" aria-roledescription="slide" aria-label="9 of 14" hidden>
+      <figure class="shot-slide" data-slide="8" role="group" aria-roledescription="slide" aria-label="9 of 13" hidden>
         <img src="screenshots/n8n-editor-smtp-test-gmail.png" alt="SMTP Test Workflow">
         <figcaption>
           <span class="slide-num">09 · Editor</span>
@@ -631,7 +631,7 @@ graph LR
           <span class="desc">Validate outbound email without a real SMTP provider.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="9" role="group" aria-roledescription="slide" aria-label="10 of 14" hidden>
+      <figure class="shot-slide" data-slide="9" role="group" aria-roledescription="slide" aria-label="10 of 13" hidden>
         <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
         <figcaption>
           <span class="slide-num">10 · UI</span>
@@ -639,7 +639,7 @@ graph LR
           <span class="desc">Overview of executions and workflow health on OpenShift.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="10" role="group" aria-roledescription="slide" aria-label="11 of 14" hidden>
+      <figure class="shot-slide" data-slide="10" role="group" aria-roledescription="slide" aria-label="11 of 13" hidden>
         <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
         <figcaption>
           <span class="slide-num">11 · Mailpit</span>
@@ -647,7 +647,7 @@ graph LR
           <span class="desc">Captured HTML emails from MCP monitors in the in-cluster SMTP UI.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="11" role="group" aria-roledescription="slide" aria-label="12 of 14" hidden>
+      <figure class="shot-slide" data-slide="11" role="group" aria-roledescription="slide" aria-label="12 of 13" hidden>
         <img src="screenshots/mailpit-email-detail.png" alt="Mailpit Email Detail - Pod Status Report">
         <figcaption>
           <span class="slide-num">12 · Mailpit</span>
@@ -655,20 +655,12 @@ graph LR
           <span class="desc">Branded email with pod table and Granite analysis.</span>
         </figcaption>
       </figure>
-      <figure class="shot-slide" data-slide="12" role="group" aria-roledescription="slide" aria-label="13 of 14" hidden>
+      <figure class="shot-slide" data-slide="12" role="group" aria-roledescription="slide" aria-label="13 of 13" hidden>
         <img src="screenshots/mcp-inspector-monitor-deployments.png" alt="MCP Inspector - monitorDeployments tool output">
         <figcaption>
           <span class="slide-num">13 · MCP</span>
           <strong>MCP Inspector</strong>
           <span class="desc"><code>monitorDeployments</code>: healthy deployments verified interactively.</span>
-        </figcaption>
-      </figure>
-      <figure class="shot-slide" data-slide="13" role="group" aria-roledescription="slide" aria-label="14 of 14" hidden>
-        <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with Red Hat UBI image">
-        <figcaption>
-          <span class="slide-num">14 · Local</span>
-          <strong>Podman + UBI image</strong>
-          <span class="desc">n8n 2.36.7 from <code>quay.io/maximilianopizarro/n8n</code> on Red Hat UBI.</span>
         </figcaption>
       </figure>
     </div>
@@ -679,7 +671,7 @@ graph LR
         <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
       </div>
       <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
-      <span class="shot-status" aria-live="polite">1 / 14</span>
+      <span class="shot-status" aria-live="polite">1 / 13</span>
     </div>
   </div>
 </div>
@@ -1019,8 +1011,8 @@ graph LR
         <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with UBI 9 image from Quay.io">
         <figcaption>
           <span class="slide-num">Local</span>
-          <strong>Podman + Quay UBI image</strong>
-          <span class="desc">n8n 2.36.7 from <code>quay.io/maximilianopizarro/n8n</code> on Red Hat UBI 9.</span>
+          <strong>n8n welcome (UBI image)</strong>
+          <span class="desc">Editor after starting <code>quay.io/maximilianopizarro/n8n:2.36.7</code> locally (e.g. with Podman).</span>
         </figcaption>
       </figure>
     </div>
