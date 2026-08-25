@@ -80,6 +80,16 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     color: white;
     border: 2px solid rgba(255,255,255,0.3);
   }
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-size: 0.85em;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background: var(--n8n-light);
+    border: 1px solid var(--n8n-border);
+    border-radius: 4px;
+    box-shadow: 0 1px 0 var(--n8n-border);
+  }
   .section {
     max-width: 960px;
     margin: 40px auto;
@@ -242,6 +252,138 @@ title: n8n Helm Chart for Kubernetes & OpenShift
     background: var(--n8n-light);
     font-weight: 600;
   }
+
+  /* Screenshot carousel (same pattern as demo-lightwell journey) */
+  .shot-carousel {
+    position: relative;
+    background: #0f0f23;
+    border: 1px solid var(--n8n-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+    width: 100%;
+    margin: 20px 0 28px;
+  }
+  .shot-carousel:focus { outline: 2px solid var(--n8n-primary); outline-offset: 3px; }
+  .shot-carousel.is-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background: #0f0f23;
+  }
+  .shot-carousel.is-fullscreen .shot-viewport { flex: 1; min-height: 0; }
+  .shot-carousel.is-fullscreen .shot-slide img {
+    height: calc(100vh - 11rem);
+    max-height: none;
+    min-height: 0;
+  }
+  body.shot-fs-open { overflow: hidden; }
+  .shot-viewport {
+    position: relative;
+    min-height: min(62vh, 480px);
+    background: #151528;
+  }
+  .shot-slide {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+  }
+  .shot-slide.is-active { display: flex; }
+  .shot-slide img {
+    width: 100%;
+    height: min(56vh, 440px);
+    object-fit: contain;
+    object-position: center top;
+    background: #1a1a2e;
+    display: block;
+    cursor: zoom-in;
+  }
+  .shot-slide figcaption {
+    padding: 1rem 1.25rem 1.15rem;
+    background: #fff;
+    border-top: 1px solid var(--n8n-border);
+  }
+  .shot-slide .slide-num {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--n8n-primary);
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+  .shot-slide strong {
+    display: block;
+    color: var(--n8n-secondary);
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+  }
+  .shot-slide figcaption span.desc {
+    color: var(--n8n-muted);
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .shot-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border-top: 1px solid var(--n8n-border);
+    flex-wrap: wrap;
+  }
+  .shot-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .shot-btn {
+    appearance: none;
+    border: 1px solid var(--n8n-border);
+    background: #fff;
+    color: var(--n8n-secondary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .shot-btn:hover { border-color: var(--n8n-primary); color: var(--n8n-primary); }
+  .shot-btn:focus-visible { outline: 2px solid var(--n8n-primary); outline-offset: 2px; }
+  .shot-dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+    flex: 1;
+  }
+  .shot-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: #c8c8c8;
+    cursor: pointer;
+  }
+  .shot-dot[aria-current="true"] {
+    background: var(--n8n-primary);
+    transform: scale(1.25);
+  }
+  .shot-status {
+    font-size: 0.8rem;
+    color: var(--n8n-muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 640px) {
+    .shot-slide img { height: auto; min-height: 220px; }
+    .shot-viewport { min-height: 280px; }
+  }
   .lightbox-overlay {
     display: none;
     position: fixed;
@@ -317,6 +459,7 @@ title: n8n Helm Chart for Kubernetes & OpenShift
   </div>
   <div class="cta-buttons">
     <a href="#installation" class="cta-btn cta-primary">Get Started</a>
+    <a href="#screenshots" class="cta-btn cta-secondary">Screenshots</a>
     <a href="https://github.com/maximilianoPizarro/n8n-helm-chart" class="cta-btn cta-secondary">View on GitHub</a>
   </div>
 </div>
@@ -410,82 +553,133 @@ graph LR
   </table>
 </div>
 
-<div class="section">
+<div class="section" id="screenshots">
   <h2>Screenshots</h2>
+  <p>Browse the product tour — workflows, Mailpit, MCP Inspector, and local Podman. Use arrows, dots, or swipe; press <kbd>F</kbd> for fullscreen.</p>
 
-  <h3>All Workflows</h3>
-  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-all-workflows-list.png" alt="All 7 OpenShift MCP Workflows">
-      <div class="caption">n8n - 8 OpenShift MCP Server Workflows Imported</div>
+  <div class="shot-carousel" role="region" aria-roledescription="carousel" aria-label="n8n product screenshots" tabindex="0">
+    <div class="shot-viewport">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 14">
+        <img src="screenshots/n8n-all-workflows-list.png" alt="All OpenShift MCP Workflows">
+        <figcaption>
+          <span class="slide-num">01 · Workflows</span>
+          <strong>Imported MCP workflows</strong>
+          <span class="desc">n8n with the OpenShift MCP Server workflow pack ready to run.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 14" hidden>
+        <img src="screenshots/n8n-editor-openshift-pod-monitor-ai-agent-mcp-tools.png" alt="Pod Monitor AI Agent with MCP Tools">
+        <figcaption>
+          <span class="slide-num">02 · Editor</span>
+          <strong>Pod Monitor — AI Agent + MCP</strong>
+          <span class="desc">Agent node wired to OpenShift MCP tools for live cluster queries.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="2" role="group" aria-roledescription="slide" aria-label="3 of 14" hidden>
+        <img src="screenshots/n8n-editor-openshift-pod-monitor-mcp-granite-email.png" alt="Pod Monitor MCP + Granite + Email">
+        <figcaption>
+          <span class="slide-num">03 · Editor</span>
+          <strong>Pod Monitor — Granite + email</strong>
+          <span class="desc">MCP call → LiteLLM/Granite analysis → branded HTML email via Mailpit.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="3" role="group" aria-roledescription="slide" aria-label="4 of 14" hidden>
+        <img src="screenshots/n8n-editor-deployment-rollout-status.png" alt="Deployment Rollout Status">
+        <figcaption>
+          <span class="slide-num">04 · Editor</span>
+          <strong>Deployment rollout status</strong>
+          <span class="desc">Track rollout health and surface issues before they hit production.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="4" role="group" aria-roledescription="slide" aria-label="5 of 14" hidden>
+        <img src="screenshots/n8n-editor-resource-quota-monitor.png" alt="Resource Quota Monitor">
+        <figcaption>
+          <span class="slide-num">05 · Editor</span>
+          <strong>Resource quota monitor</strong>
+          <span class="desc">Watch namespace quotas and alert when usage approaches limits.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="5" role="group" aria-roledescription="slide" aria-label="6 of 14" hidden>
+        <img src="screenshots/n8n-editor-security-audit.png" alt="Security Audit">
+        <figcaption>
+          <span class="slide-num">06 · Editor</span>
+          <strong>Security audit</strong>
+          <span class="desc">Scan cluster posture and summarize findings with the LLM.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="6" role="group" aria-roledescription="slide" aria-label="7 of 14" hidden>
+        <img src="screenshots/n8n-editor-route-tls-expiry.png" alt="Route TLS Expiry Check">
+        <figcaption>
+          <span class="slide-num">07 · Editor</span>
+          <strong>Route &amp; TLS expiry</strong>
+          <span class="desc">Detect expiring certificates on OpenShift Routes before outages.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="7" role="group" aria-roledescription="slide" aria-label="8 of 14" hidden>
+        <img src="screenshots/n8n-editor-event-anomaly-detector.png" alt="Event Anomaly Detector">
+        <figcaption>
+          <span class="slide-num">08 · Editor</span>
+          <strong>Event anomaly detector</strong>
+          <span class="desc">Correlated Kubernetes events with AI explanation in the email report.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="8" role="group" aria-roledescription="slide" aria-label="9 of 14" hidden>
+        <img src="screenshots/n8n-editor-smtp-test-gmail.png" alt="SMTP Test Workflow">
+        <figcaption>
+          <span class="slide-num">09 · Editor</span>
+          <strong>SMTP test via Mailpit</strong>
+          <span class="desc">Validate outbound email without a real SMTP provider.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="9" role="group" aria-roledescription="slide" aria-label="10 of 14" hidden>
+        <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
+        <figcaption>
+          <span class="slide-num">10 · UI</span>
+          <strong>n8n dashboard</strong>
+          <span class="desc">Overview of executions and workflow health on OpenShift.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="10" role="group" aria-roledescription="slide" aria-label="11 of 14" hidden>
+        <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
+        <figcaption>
+          <span class="slide-num">11 · Mailpit</span>
+          <strong>Inbox — workflow reports</strong>
+          <span class="desc">Captured HTML emails from MCP monitors in the in-cluster SMTP UI.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="11" role="group" aria-roledescription="slide" aria-label="12 of 14" hidden>
+        <img src="screenshots/mailpit-email-detail.png" alt="Mailpit Email Detail - Pod Status Report">
+        <figcaption>
+          <span class="slide-num">12 · Mailpit</span>
+          <strong>Pod status HTML report</strong>
+          <span class="desc">Branded email with pod table and Granite analysis.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="12" role="group" aria-roledescription="slide" aria-label="13 of 14" hidden>
+        <img src="screenshots/mcp-inspector-monitor-deployments.png" alt="MCP Inspector - monitorDeployments tool output">
+        <figcaption>
+          <span class="slide-num">13 · MCP</span>
+          <strong>MCP Inspector</strong>
+          <span class="desc"><code>monitorDeployments</code>: healthy deployments verified interactively.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="13" role="group" aria-roledescription="slide" aria-label="14 of 14" hidden>
+        <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with Red Hat UBI image">
+        <figcaption>
+          <span class="slide-num">14 · Local</span>
+          <strong>Podman + UBI image</strong>
+          <span class="desc">n8n 2.36.7 from <code>quay.io/maximilianopizarro/n8n</code> on Red Hat UBI.</span>
+        </figcaption>
+      </figure>
     </div>
-  </div>
-
-  <h3>OpenShift MCP Server Workflow Examples</h3>
-  <div class="screenshot-grid">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-openshift-pod-monitor-ai-agent-mcp-tools.png" alt="Pod Monitor AI Agent with MCP Tools">
-      <div class="caption">1. Pod Monitor - AI Agent with MCP Tools</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-openshift-pod-monitor-mcp-granite-email.png" alt="Pod Monitor MCP + Granite + Email">
-      <div class="caption">2. Pod Monitor - MCP + Granite + Email</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-deployment-rollout-status.png" alt="Deployment Rollout Status">
-      <div class="caption">3. Deployment Rollout Status</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-resource-quota-monitor.png" alt="Resource Quota Monitor">
-      <div class="caption">4. Resource Quota Monitor</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-security-audit.png" alt="Security Audit">
-      <div class="caption">5. Security Audit</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-route-tls-expiry.png" alt="Route TLS Expiry Check">
-      <div class="caption">6. Route &amp; TLS Expiry Check</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-event-anomaly-detector.png" alt="Event Anomaly Detector">
-      <div class="caption">7. Event Anomaly Detector</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-editor-smtp-test-gmail.png" alt="SMTP Test Workflow">
-      <div class="caption">SMTP Test - Email via Mailpit</div>
-    </div>
-  </div>
-
-  <h3>Services</h3>
-  <div class="screenshot-grid">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-dashboard.png" alt="n8n Dashboard">
-      <div class="caption">n8n Dashboard Overview</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
-      <div class="caption">Mailpit Inbox - Workflow Email Reports</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-email-detail.png" alt="Mailpit Email Detail - Pod Status Report">
-      <div class="caption">Pod Status Report - HTML Email via Mailpit</div>
-    </div>
-  </div>
-
-  <h3>MCP Inspector - Tool Verification</h3>
-  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
-    <div class="screenshot-card">
-      <img src="screenshots/mcp-inspector-monitor-deployments.png" alt="MCP Inspector - monitorDeployments tool output">
-      <div class="caption">MCP Inspector - monitorDeployments: 11 deployments healthy, 0 issues</div>
-    </div>
-  </div>
-
-  <h3>Podman Local Development</h3>
-  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with Red Hat UBI 9 image">
-      <div class="caption">n8n 2.36.7 via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9 + Node.js 22)</div>
+    <div class="shot-controls">
+      <div class="shot-nav">
+        <button type="button" class="shot-btn shot-prev" aria-label="Previous slide">← Prev</button>
+        <button type="button" class="shot-btn shot-next" aria-label="Next slide">Next →</button>
+        <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
+      </div>
+      <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
+      <span class="shot-status" aria-live="polite">1 / 14</span>
     </div>
   </div>
 </div>
@@ -540,22 +734,49 @@ graph LR
   <h2>AI Assistant (n8n 2.36+) on Developer Sandbox</h2>
   <p>The built-in <strong>AI Assistant</strong> (<code>instance-ai</code>) needs three pieces. The shared Sandbox <strong>Qwen/Granite</strong> models only cover the <em>Model</em> — they do <strong>not</strong> replace the Code sandbox.</p>
 
-  <div class="screenshot-grid" style="margin:24px 0;">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-ai-assistant-setup-searxng-1.18.png" alt="AI Assistant setup — Model and Web search from server config">
-      <div class="caption">AI Assistant setup: Model + Web search from env; Code sandbox still Not set without Daytona</div>
+  <div class="shot-carousel" id="ai-assistant-carousel" role="region" aria-roledescription="carousel" aria-label="AI Assistant on Developer Sandbox" tabindex="0">
+    <div class="shot-viewport">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 4">
+        <img src="screenshots/n8n-ai-assistant-setup-searxng-1.18.png" alt="AI Assistant setup — Model and Web search from server config">
+        <figcaption>
+          <span class="slide-num">01 · Setup</span>
+          <strong>Model + Web search from env</strong>
+          <span class="desc">LiteLLM granite and SearXNG show as <em>Found in server configuration</em>; Code sandbox still needs Daytona.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 4" hidden>
+        <img src="screenshots/n8n-ai-assistant-settings-1.18.png" alt="AI Assistant settings">
+        <figcaption>
+          <span class="slide-num">02 · Settings</span>
+          <strong>Settings → AI Assistant</strong>
+          <span class="desc">Model managed by environment variables on the Helm chart.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="2" role="group" aria-roledescription="slide" aria-label="3 of 4" hidden>
+        <img src="screenshots/n8n-ai-assistant-ready-daytona-1.18.png" alt="AI Assistant ready after Daytona">
+        <figcaption>
+          <span class="slide-num">03 · Ready</span>
+          <strong>What do you want to automate?</strong>
+          <span class="desc">After Daytona Code sandbox, the conversational Assistant is ready.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="3" role="group" aria-roledescription="slide" aria-label="4 of 4" hidden>
+        <img src="screenshots/n8n-ai-assistant-prompt-1.18.png" alt="AI Assistant prompt — Gmail invoices workflow">
+        <figcaption>
+          <span class="slide-num">04 · Prompt</span>
+          <strong>Live prompt on Developer Sandbox</strong>
+          <span class="desc">Gmail → Claude → Sheets → Calendar request answered via LiteLLM granite (strip-proxy for tool_choice).</span>
+        </figcaption>
+      </figure>
     </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-ai-assistant-settings-1.18.png" alt="AI Assistant settings">
-      <div class="caption">Settings → AI Assistant — model managed by environment variables</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-ai-assistant-ready-daytona-1.18.png" alt="AI Assistant ready after Daytona">
-      <div class="caption">Assistant ready: What do you want to automate? (Daytona Code sandbox)</div>
-    </div>
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-ai-assistant-prompt-1.18.png" alt="AI Assistant prompt — Gmail invoices workflow">
-      <div class="caption">Live prompt on Developer Sandbox (LiteLLM granite + strip-proxy for tool_choice)</div>
+    <div class="shot-controls">
+      <div class="shot-nav">
+        <button type="button" class="shot-btn shot-prev" aria-label="Previous slide">← Prev</button>
+        <button type="button" class="shot-btn shot-next" aria-label="Next slide">Next →</button>
+        <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
+      </div>
+      <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
+      <span class="shot-status" aria-live="polite">1 / 4</span>
     </div>
   </div>
 
@@ -692,14 +913,33 @@ graph LR
   <p>When Mailpit is enabled, n8n workflows can send branded HTML email reports that are captured and viewable in the Mailpit web UI. Configure n8n SMTP credentials to point to the Mailpit service:</p>
   <div class="code-block">main:<br>&nbsp;&nbsp;config:<br>&nbsp;&nbsp;&nbsp;&nbsp;n8n:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_host: "&lt;release-name&gt;-mailpit"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_port: "1025"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_ssl: "false"</div>
   <p>Access the Mailpit web UI via its OpenShift Route to view all captured email reports from your workflows.</p>
-  <div class="screenshot-grid">
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
-      <div class="caption">Mailpit Inbox - Workflow Email Reports</div>
+  <div class="shot-carousel" role="region" aria-roledescription="carousel" aria-label="Mailpit email output" tabindex="0">
+    <div class="shot-viewport">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 2">
+        <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox with OpenShift Reports">
+        <figcaption>
+          <span class="slide-num">01 · Inbox</span>
+          <strong>Workflow email reports</strong>
+          <span class="desc">Captured messages from MCP monitors in the in-cluster SMTP UI.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 2" hidden>
+        <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report Email">
+        <figcaption>
+          <span class="slide-num">02 · Detail</span>
+          <strong>Pod status HTML report</strong>
+          <span class="desc">Rendered branded email with pod health and AI analysis.</span>
+        </figcaption>
+      </figure>
     </div>
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report Email">
-      <div class="caption">Pod Status Report - Rendered HTML Email</div>
+    <div class="shot-controls">
+      <div class="shot-nav">
+        <button type="button" class="shot-btn shot-prev" aria-label="Previous slide">← Prev</button>
+        <button type="button" class="shot-btn shot-next" aria-label="Next slide">Next →</button>
+        <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
+      </div>
+      <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
+      <span class="shot-status" aria-live="polite">1 / 2</span>
     </div>
   </div>
 </div>
@@ -773,10 +1013,25 @@ graph LR
   <h3>Build &amp; Run Locally with Podman</h3>
   <p>You can build and test the UBI container image locally using Podman (or Docker) before deploying to a cluster:</p>
 
-  <div class="screenshot-grid" style="grid-template-columns: 1fr;">
-    <div class="screenshot-card">
-      <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with UBI 9 image from Quay.io">
-      <div class="caption">n8n 2.36.7 running locally via Podman - quay.io/maximilianopizarro/n8n (Red Hat UBI 9)</div>
+  <div class="shot-carousel" role="region" aria-roledescription="carousel" aria-label="Podman local run" tabindex="0">
+    <div class="shot-viewport">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 1">
+        <img src="screenshots/n8n-podman-welcome.png" alt="n8n running locally via Podman with UBI 9 image from Quay.io">
+        <figcaption>
+          <span class="slide-num">Local</span>
+          <strong>Podman + Quay UBI image</strong>
+          <span class="desc">n8n 2.36.7 from <code>quay.io/maximilianopizarro/n8n</code> on Red Hat UBI 9.</span>
+        </figcaption>
+      </figure>
+    </div>
+    <div class="shot-controls">
+      <div class="shot-nav">
+        <button type="button" class="shot-btn shot-prev" aria-label="Previous slide">← Prev</button>
+        <button type="button" class="shot-btn shot-next" aria-label="Next slide">Next →</button>
+        <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
+      </div>
+      <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
+      <span class="shot-status" aria-live="polite">1 / 1</span>
     </div>
   </div>
 
@@ -844,6 +1099,7 @@ graph LR
     <li>Charts <strong>1.17.1</strong> / <strong>1.16.0</strong> remain available for existing catalog RC installs</li>
     <li>Documented AI Assistant setup on Developer Sandbox: LiteLLM Model + SearXNG Web search; Code sandbox requires Daytona (n8n Sandbox / DinD not allowed)</li>
     <li>Added screenshots: Daytona-ready Assistant UI and a live workflow prompt (Gmail/Claude/Sheets/Calendar)</li>
+    <li>GitHub Pages: screenshot grids replaced with described carousels (Prev/Next, dots, fullscreen, swipe)</li>
   </ul>
   <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml</div>
 
@@ -920,14 +1176,33 @@ graph LR
 
   <h4 style="margin-top:24px;">Email Report Screenshots</h4>
   <p>Actual email reports generated by the MCP workflows and captured in Mailpit:</p>
-  <div class="screenshot-grid">
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox - 3 workflow email reports">
-      <div class="caption">Mailpit Inbox — Resource Quota, Security Audit, Pod Status reports</div>
+  <div class="shot-carousel" role="region" aria-roledescription="carousel" aria-label="Email report screenshots" tabindex="0">
+    <div class="shot-viewport">
+      <figure class="shot-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 2">
+        <img src="screenshots/mailpit-inbox.png" alt="Mailpit Inbox - 3 workflow email reports">
+        <figcaption>
+          <span class="slide-num">01 · Inbox</span>
+          <strong>Resource Quota, Security Audit, Pod Status</strong>
+          <span class="desc">Three MCP workflow reports captured side by side in Mailpit.</span>
+        </figcaption>
+      </figure>
+      <figure class="shot-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 2" hidden>
+        <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report - branded HTML email with pod table">
+        <figcaption>
+          <span class="slide-num">02 · Report</span>
+          <strong>Pod Status — Granite 3.1 8B</strong>
+          <span class="desc">Red Hat branded HTML with pod health table and AI analysis.</span>
+        </figcaption>
+      </figure>
     </div>
-    <div class="screenshot-card">
-      <img src="screenshots/mailpit-email-detail.png" alt="Pod Status Report - branded HTML email with pod table">
-      <div class="caption">Pod Status Report — Red Hat branded HTML with pod health table, AI analysis by Granite 3.1 8B</div>
+    <div class="shot-controls">
+      <div class="shot-nav">
+        <button type="button" class="shot-btn shot-prev" aria-label="Previous slide">← Prev</button>
+        <button type="button" class="shot-btn shot-next" aria-label="Next slide">Next →</button>
+        <button type="button" class="shot-btn shot-fs" aria-label="Toggle fullscreen" aria-pressed="false">Fullscreen</button>
+      </div>
+      <div class="shot-dots" role="tablist" aria-label="Slide picker"></div>
+      <span class="shot-status" aria-live="polite">1 / 2</span>
     </div>
   </div>
 
@@ -945,20 +1220,133 @@ graph LR
 
 <script>
 (function(){
+  /* ── Screenshot carousels (demo-lightwell journey pattern) ── */
+  function initCarousel(root) {
+    var slides = Array.prototype.slice.call(root.querySelectorAll(".shot-slide"));
+    if (!slides.length) return;
+    var dotsWrap = root.querySelector(".shot-dots");
+    var statusEl = root.querySelector(".shot-status");
+    var prevBtn = root.querySelector(".shot-prev");
+    var nextBtn = root.querySelector(".shot-next");
+    var fsBtn = root.querySelector(".shot-fs");
+    var index = 0;
+    var timer = null;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var touchX = null;
+    var fsOpen = false;
+
+    function setFullscreen(on) {
+      fsOpen = !!on;
+      root.classList.toggle("is-fullscreen", fsOpen);
+      document.body.classList.toggle("shot-fs-open", fsOpen);
+      if (fsBtn) {
+        fsBtn.setAttribute("aria-pressed", fsOpen ? "true" : "false");
+        fsBtn.textContent = fsOpen ? "Exit fullscreen" : "Fullscreen";
+        fsBtn.setAttribute("aria-label", fsOpen ? "Exit fullscreen" : "Toggle fullscreen");
+      }
+      if (fsOpen) {
+        stop();
+        try { root.focus({ preventScroll: true }); } catch (_) { root.focus(); }
+      } else {
+        restart();
+      }
+    }
+
+    slides.forEach(function (_, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "shot-dot";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-label", "Go to slide " + (i + 1));
+      b.addEventListener("click", function () { go(i, true); });
+      dotsWrap.appendChild(b);
+    });
+
+    function go(n, user) {
+      index = (n + slides.length) % slides.length;
+      slides.forEach(function (slide, i) {
+        var on = i === index;
+        slide.classList.toggle("is-active", on);
+        if (on) slide.removeAttribute("hidden");
+        else slide.setAttribute("hidden", "");
+        slide.setAttribute("aria-hidden", on ? "false" : "true");
+        slide.setAttribute("aria-label", (i + 1) + " of " + slides.length);
+      });
+      Array.prototype.forEach.call(dotsWrap.children, function (dot, i) {
+        if (i === index) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+      });
+      if (statusEl) statusEl.textContent = (index + 1) + " / " + slides.length;
+      if (user && !fsOpen) restart();
+    }
+
+    function next() { go(index + 1, false); }
+    function restart() { stop(); if (reduced || slides.length < 2) return; timer = window.setInterval(next, 7000); }
+    function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
+
+    if (prevBtn) prevBtn.addEventListener("click", function () { go(index - 1, true); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { go(index + 1, true); });
+    if (fsBtn) fsBtn.addEventListener("click", function () { setFullscreen(!fsOpen); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && fsOpen) { e.preventDefault(); setFullscreen(false); return; }
+      if (e.key === "ArrowRight") { e.preventDefault(); go(index + 1, true); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1, true); }
+      if ((e.key === "f" || e.key === "F") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        setFullscreen(!fsOpen);
+      }
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && fsOpen) setFullscreen(false);
+    });
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", function () { if (!fsOpen) restart(); });
+    root.addEventListener("focusin", stop);
+    root.addEventListener("focusout", function (e) { if (!fsOpen && !root.contains(e.relatedTarget)) restart(); });
+    root.addEventListener("touchstart", function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+    root.addEventListener("touchend", function (e) {
+      if (touchX == null) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      touchX = null;
+      if (Math.abs(dx) < 40) return;
+      if (dx < 0) go(index + 1, true); else go(index - 1, true);
+    }, { passive: true });
+
+    go(0, false);
+    restart();
+  }
+
+  document.querySelectorAll(".shot-carousel").forEach(initCarousel);
+
+  /* ── Lightbox (grid cards + carousel slides) ── */
   var overlay = document.getElementById('lightbox');
   var lbImg = document.getElementById('lightbox-img');
   var lbCap = document.getElementById('lightbox-caption');
   var lbClose = document.getElementById('lightbox-close');
 
-  document.querySelectorAll('.screenshot-card img').forEach(function(img){
-    img.addEventListener('click', function(){
-      lbImg.src = this.src;
-      lbImg.alt = this.alt;
-      var caption = this.closest('.screenshot-card').querySelector('.caption');
-      lbCap.textContent = caption ? caption.textContent : this.alt;
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
+  function openLightbox(img) {
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    var slide = img.closest('.shot-slide');
+    var card = img.closest('.screenshot-card');
+    var cap = '';
+    if (slide) {
+      var title = slide.querySelector('strong');
+      var desc = slide.querySelector('.desc');
+      cap = (title ? title.textContent : img.alt) + (desc ? ' — ' + desc.textContent : '');
+    } else if (card) {
+      var c = card.querySelector('.caption');
+      cap = c ? c.textContent : img.alt;
+    } else {
+      cap = img.alt;
+    }
+    lbCap.textContent = cap;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.screenshot-card img, .shot-slide img').forEach(function(img){
+    img.addEventListener('click', function(){ openLightbox(this); });
   });
 
   function closeLightbox(){
@@ -971,7 +1359,7 @@ graph LR
   });
   lbClose.addEventListener('click', closeLightbox);
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'Escape' && overlay.classList.contains('active')) closeLightbox();
   });
 })();
 </script>
