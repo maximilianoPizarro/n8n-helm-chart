@@ -235,6 +235,10 @@ main:
 
 In **Settings → AI Assistant** / `/assistant`, Model should show *Found in server configuration*.
 
+Screenshot of a live prompt on Developer Sandbox (after Daytona): `docs/screenshots/n8n-ai-assistant-prompt-1.18.png`.
+
+> **Note:** Shared Sandbox vLLM does not support `tool_choice: auto`. Route Instance AI through a small strip-proxy that drops `tools`/`tool_choice` so chat works (function calling still needs OpenAI/Anthropic/OpenRouter or a tool-capable vLLM).
+
 #### 2. Web search (SearXNG)
 
 ```shell

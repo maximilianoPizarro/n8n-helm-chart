@@ -549,6 +549,14 @@ graph LR
       <img src="screenshots/n8n-ai-assistant-settings-1.18.png" alt="AI Assistant settings">
       <div class="caption">Settings → AI Assistant — model managed by environment variables</div>
     </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-ai-assistant-ready-daytona-1.18.png" alt="AI Assistant ready after Daytona">
+      <div class="caption">Assistant ready: What do you want to automate? (Daytona Code sandbox)</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-ai-assistant-prompt-1.18.png" alt="AI Assistant prompt — Gmail invoices workflow">
+      <div class="caption">Live prompt on Developer Sandbox (LiteLLM granite + strip-proxy for tool_choice)</div>
+    </div>
   </div>
 
   <table class="styled-table">
@@ -835,6 +843,7 @@ graph LR
     <li>Default <code>route.sccRoleDisabled: true</code> for Developer Sandbox-friendly catalog installs</li>
     <li>Charts <strong>1.17.1</strong> / <strong>1.16.0</strong> remain available for existing catalog RC installs</li>
     <li>Documented AI Assistant setup on Developer Sandbox: LiteLLM Model + SearXNG Web search; Code sandbox requires Daytona (n8n Sandbox / DinD not allowed)</li>
+    <li>Added screenshots: Daytona-ready Assistant UI and a live workflow prompt (Gmail/Claude/Sheets/Calendar)</li>
   </ul>
   <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml</div>
 
