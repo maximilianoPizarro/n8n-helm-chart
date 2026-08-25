@@ -20,6 +20,7 @@ Also see GitHub Releases: https://github.com/maximilianoPizarro/n8n-helm-chart/r
 
 - UBI image / CI default target n8n **2.36.7**
 - Chart **1.17.1** / **1.16.0** remain available for existing catalog RC installs
+- Documented AI Assistant on Developer Sandbox: Model (LiteLLM/Qwen) + Web search (SearXNG); Code sandbox requires Daytona (privileged n8n Sandbox not available)
 
 ```shell
 helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml

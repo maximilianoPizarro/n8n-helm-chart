@@ -198,6 +198,137 @@ main:
       user_folder: "/data"
 ```
 
+### AI Assistant on OpenShift Developer Sandbox
+
+n8n **2.36+** ships an **AI Assistant** (`instance-ai`). On Developer Sandbox it has three pieces — the LLM is **not** the same thing as the Code sandbox.
+
+| Piece | What it is | Sandbox approach |
+|-------|------------|------------------|
+| **Model** | LLM the Assistant thinks with | LiteLLM → shared Qwen (alias `granite`) from `sandbox-shared-models` |
+| **Web search** | Docs / research | In-cluster [SearXNG](https://github.com/searxng/searxng) |
+| **Code sandbox** | Where the Assistant runs code/files when building workflows | **Daytona** (API key) — *or* local Docker Compose. The in-UI **n8n Sandbox** option needs privileged DinD/Sysbox and **cannot** run on Developer Sandbox |
+
+#### 1. Model (Qwen / Granite via LiteLLM)
+
+Deploy [OpenShift MCP Server](https://maximilianopizarro.github.io/openshift-mcp-server/) with the Developer Sandbox overlay (includes LiteLLM). Refresh the OAuth token ~every 24h:
+
+```shell
+helm upgrade --install openshift-mcp-server \
+  https://maximilianoPizarro.github.io/openshift-mcp-server/openshift-mcp-server-0.1.0-alpha.tgz \
+  -f https://raw.githubusercontent.com/maximilianoPizarro/openshift-mcp-server/main/helm/openshift-mcp-server/values-developer-sandbox.yaml \
+  --set namespace=$NAMESPACE \
+  --set litellm.model.name=granite \
+  --set litellm.model.apiKey=$(oc whoami -t)
+```
+
+Point n8n at LiteLLM (`values-sandbox.yaml`):
+
+```yaml
+main:
+  extraEnvVars:
+    N8N_ENABLED_MODULES: "instance-ai"
+    N8N_INSTANCE_AI_MODEL: "granite"
+    N8N_INSTANCE_AI_MODEL_URL: "http://openshift-mcp-server-litellm:4000/v1"
+    N8N_INSTANCE_AI_MODEL_API_KEY: "sk-openshift-mcp-1234"   # LiteLLM masterKey
+    N8N_INSTANCE_AI_MCP_SERVERS: "openshift=http://openshift-mcp-server:8080/mcp,kubernetes=http://openshift-mcp-server-k8s-mcp:8085/mcp"
+```
+
+In **Settings → AI Assistant** / `/assistant`, Model should show *Found in server configuration*.
+
+#### 2. Web search (SearXNG)
+
+```shell
+# Minimal example (same pattern as the Sandbox test install)
+oc apply -f - <<'EOF'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-searxng-settings
+data:
+  settings.yml: |
+    use_default_settings: true
+    search:
+      formats: [html, json]
+    server:
+      secret_key: "change-me"
+      limiter: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-searxng
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: n8n-searxng }
+  template:
+    metadata:
+      labels: { app: n8n-searxng }
+    spec:
+      containers:
+        - name: searxng
+          image: docker.io/searxng/searxng:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: SEARXNG_BASE_URL, value: "http://n8n-searxng:8080/" }
+            - { name: SEARXNG_SECRET, value: "change-me" }
+          volumeMounts:
+            - { name: settings, mountPath: /etc/searxng/settings.yml, subPath: settings.yml }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+            runAsNonRoot: true
+      volumes:
+        - name: settings
+          configMap: { name: n8n-searxng-settings }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-searxng
+spec:
+  selector: { app: n8n-searxng }
+  ports: [{ port: 8080, targetPort: 8080 }]
+EOF
+
+oc set env deploy/n8n N8N_INSTANCE_AI_SEARXNG_URL=http://n8n-searxng:8080
+```
+
+Or set in values:
+
+```yaml
+main:
+  extraEnvVars:
+    N8N_INSTANCE_AI_SEARXNG_URL: "http://n8n-searxng:8080"
+```
+
+#### 3. Code sandbox (required for full Assistant / Finish setup)
+
+Without a Code sandbox, `/assistant` keeps **Code sandbox → Not set** and **Finish setup** stays incomplete. Qwen/Granite do **not** replace this — they only supply the Model.
+
+**Option A — Daytona (works on Developer Sandbox):**
+
+```yaml
+main:
+  extraEnvVars:
+    N8N_INSTANCE_AI_SANDBOX_ENABLED: "true"
+    N8N_INSTANCE_AI_SANDBOX_PROVIDER: "daytona"
+    DAYTONA_API_URL: "https://app.daytona.io/api"
+    DAYTONA_API_KEY: "<your-daytona-api-key>"
+```
+
+Or in the UI: **Add sandbox → Daytona** and paste the API key.
+
+**Option B — n8n Sandbox service (local / full cluster only):**
+
+Needs privileged Docker-in-Docker or Sysbox ([n8n docs](https://docs.n8n.io/hosting/configuration/environment-variables/) / [Docker Compose guide](https://docs.n8n.io/hosting/installation/docker/)). **Not available** on OpenShift Developer Sandbox (`privileged` is denied). Do not use the UI placeholder `http://sandbox.internal:3200` unless you actually run that service.
+
+**Option C — leave sandbox unset:**
+
+Model + Web search + MCP workflows still work. The full conversational workflow-builder Assistant does not complete setup until Daytona (or a real n8n Sandbox) is configured.
+
+Official reference: [Set up AI Assistant](https://docs.n8n.io/hosting/configuration/environment-variables/).
+
 ### Run from Quay.io
 
 ```shell

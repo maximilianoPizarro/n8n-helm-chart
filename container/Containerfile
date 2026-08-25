@@ -3,8 +3,8 @@ ARG N8N_VERSION=2.36.7
 # Stage 1: Source - extract n8n from official Docker Hub image
 FROM docker.io/n8nio/n8n:${N8N_VERSION} AS source
 
-# Stage 2: Builder - rebuild sqlite3 native module for Node.js 22 + glibc (RHEL)
-FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS builder
+# Stage 2: Builder - rebuild sqlite3 native module for Node.js 24 + glibc (RHEL)
+FROM registry.access.redhat.com/ubi9/nodejs-24:latest AS builder
 
 USER 0
 
@@ -19,7 +19,7 @@ RUN SQLITE3_DIR=$(find /usr/local/lib/node_modules/n8n/node_modules/.pnpm -type 
      (echo "prebuild-install failed, falling back to node-gyp" && npx --yes node-gyp rebuild))
 
 # Stage 3: Runtime - minimal UBI image
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
+FROM registry.access.redhat.com/ubi9/nodejs-24-minimal:latest
 
 ARG N8N_VERSION=2.36.7
 
@@ -28,7 +28,7 @@ LABEL name="n8n" \
       version="${N8N_VERSION}" \
       release="1" \
       summary="n8n workflow automation on Red Hat UBI 9" \
-      description="n8n is a fair-code workflow automation tool. Repackaged from docker.io/n8nio/n8n:${N8N_VERSION} onto Red Hat UBI 9 with Node.js 22." \
+      description="n8n is a fair-code workflow automation tool. Repackaged from docker.io/n8nio/n8n:${N8N_VERSION} onto Red Hat UBI 9 with Node.js 24." \
       io.k8s.display-name="n8n Workflow Automation" \
       io.k8s.description="n8n workflow automation on Red Hat UBI 9" \
       io.openshift.tags="n8n,workflow,automation,ai,mcp" \

@@ -537,6 +537,49 @@ graph LR
 </div>
 
 <div class="section">
+  <h2>AI Assistant (n8n 2.36+) on Developer Sandbox</h2>
+  <p>The built-in <strong>AI Assistant</strong> (<code>instance-ai</code>) needs three pieces. The shared Sandbox <strong>Qwen/Granite</strong> models only cover the <em>Model</em> — they do <strong>not</strong> replace the Code sandbox.</p>
+
+  <div class="screenshot-grid" style="margin:24px 0;">
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-ai-assistant-setup-searxng-1.18.png" alt="AI Assistant setup — Model and Web search from server config">
+      <div class="caption">AI Assistant setup: Model + Web search from env; Code sandbox still Not set without Daytona</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshots/n8n-ai-assistant-settings-1.18.png" alt="AI Assistant settings">
+      <div class="caption">Settings → AI Assistant — model managed by environment variables</div>
+    </div>
+  </div>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Piece</th><th>Role</th><th>Developer Sandbox</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Model</strong></td><td>LLM the Assistant thinks with</td><td>LiteLLM → shared Qwen (alias <code>granite</code>)</td></tr>
+      <tr><td><strong>Web search</strong></td><td>Research / docs</td><td>In-cluster SearXNG (<code>N8N_INSTANCE_AI_SEARXNG_URL</code>)</td></tr>
+      <tr><td><strong>Code sandbox</strong></td><td>Runs code/files when building workflows</td><td><strong>Daytona</strong> API key — <em>or</em> local Docker Compose. UI option <strong>n8n Sandbox</strong> needs privileged DinD/Sysbox and cannot run here</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Model (LiteLLM + Qwen/Granite)</h3>
+  <p>Deploy OpenShift MCP Server with the Sandbox overlay, then set in <code>values-sandbox.yaml</code>:</p>
+  <div class="code-block">main:<br>&nbsp;&nbsp;extraEnvVars:<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_ENABLED_MODULES: "instance-ai"<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_INSTANCE_AI_MODEL: "granite"<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_INSTANCE_AI_MODEL_URL: "http://openshift-mcp-server-litellm:4000/v1"<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_INSTANCE_AI_MODEL_API_KEY: "sk-openshift-mcp-1234"<br>&nbsp;&nbsp;&nbsp;&nbsp;N8N_INSTANCE_AI_MCP_SERVERS: "openshift=http://openshift-mcp-server:8080/mcp,kubernetes=http://openshift-mcp-server-k8s-mcp:8085/mcp"</div>
+  <p>Refresh the shared-model OAuth token about every 24h: <code>--set litellm.model.apiKey=$(oc whoami -t)</code>.</p>
+
+  <h3>Web search (SearXNG)</h3>
+  <div class="code-block">N8N_INSTANCE_AI_SEARXNG_URL: "http://n8n-searxng:8080"</div>
+  <p>Deploy a small SearXNG Service in the same namespace (see README). After restart, <code>/assistant</code> shows Web search as <em>Found in server configuration</em>.</p>
+
+  <h3>Code sandbox (Finish setup)</h3>
+  <p>Without a Code sandbox, <strong>Finish setup</strong> stays incomplete. Qwen/Granite do not replace it.</p>
+  <p><strong>Daytona</strong> (works on Developer Sandbox):</p>
+  <div class="code-block">N8N_INSTANCE_AI_SANDBOX_ENABLED: "true"<br>N8N_INSTANCE_AI_SANDBOX_PROVIDER: "daytona"<br>DAYTONA_API_URL: "https://app.daytona.io/api"<br>DAYTONA_API_KEY: "&lt;your-daytona-api-key&gt;"</div>
+  <p>Or in the UI: <strong>Add sandbox → Daytona</strong>. Do <strong>not</strong> use the placeholder <code>http://sandbox.internal:3200</code> unless you run a real n8n Sandbox service (privileged — not available on Developer Sandbox).</p>
+  <p>Without Daytona you can still use LiteLLM in MCP workflows, Mailpit, and Model + Web search; the full conversational workflow-builder Assistant will not complete setup. Docs: <a href="https://docs.n8n.io/hosting/configuration/environment-variables/">n8n AI Assistant env vars</a>.</p>
+</div>
+
+<div class="section">
   <h2>OpenShift MCP Server Workflow Examples</h2>
   <p>Each workflow follows a <strong>5-node pipeline</strong> using the MCP Streamable HTTP protocol with full session handling (<code>initialize</code> → <code>notifications/initialized</code> → <code>tools/call</code> with <code>Mcp-Session-Id</code>), AI-powered analysis via <strong>LiteLLM/Granite</strong>, and delivers a branded HTML email report through Mailpit:</p>
   <div class="code-block" style="font-size:13px;text-align:center;letter-spacing:0.5px;">Manual Trigger → Set Parameters → <strong>MCP Tool Call</strong> (Streamable HTTP + Session) → <strong>AI Format &amp; Explain</strong> (LiteLLM/Granite) → <strong>Build Report &amp; Send Email</strong> (Mailpit API)</div>
@@ -791,6 +834,7 @@ graph LR
     <li>Fixed catalog/Sandbox CrashLoop <code>EACCES mkdir '/home/node/.cache'</code> — <code>HOME</code>/<code>N8N_USER_FOLDER</code>/<code>XDG_CACHE_HOME</code> use the writable mount path (no parent strip)</li>
     <li>Default <code>route.sccRoleDisabled: true</code> for Developer Sandbox-friendly catalog installs</li>
     <li>Charts <strong>1.17.1</strong> / <strong>1.16.0</strong> remain available for existing catalog RC installs</li>
+    <li>Documented AI Assistant setup on Developer Sandbox: LiteLLM Model + SearXNG Web search; Code sandbox requires Daytona (n8n Sandbox / DinD not allowed)</li>
   </ul>
   <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.18.0 -f values-sandbox.yaml</div>
 
