@@ -1,7 +1,7 @@
 apiVersion: v2
 name: n8n
-version: 1.18.0
-appVersion: 2.36.7
+version: 1.19.0
+appVersion: 2.45.7
 kubeVersion: ">=1.20.0"
 type: application
 description: "Helm Chart for deploying n8n on Kubernetes and Red Hat OpenShift, a fair-code workflow automation platform with native AI capabilities for technical teams. Easily automate tasks across different services. Includes optional Mailpit for email testing and OpenShift Developer Sandbox support."
@@ -40,6 +40,8 @@ annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
+    - kind: changed
+      description: "Update n8n app version from 2.36.7 to 2.45.7 (latest stable). Chart 1.18.0 remains available for existing catalog RC installs"
     - kind: changed
       description: "Update n8n app version from 2.32.7 to 2.36.7 (latest stable)"
     - kind: fixed
