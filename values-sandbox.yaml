@@ -53,6 +53,8 @@ route:
 main:
   extraEnvVars:
     N8N_LISTEN_ADDRESS: "0.0.0.0"
+    # OpenShift Route sets X-Forwarded-*; required for express-rate-limit / login
+    N8N_PROXY_HOPS: "1"
     NODE_FUNCTION_ALLOW_BUILTIN: "*"
     NODE_FUNCTION_ALLOW_EXTERNAL: "*"
     # Built-in AI Assistant (instance-ai) → LiteLLM / sandbox Qwen

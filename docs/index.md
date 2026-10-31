@@ -1088,6 +1088,7 @@ graph LR
     <li>n8n upgraded to <strong>2.45.7</strong> (latest stable) with UBI image <code>quay.io/maximilianopizarro/n8n:2.45.7</code></li>
     <li>Charts <strong>1.18.0</strong> / <strong>1.17.1</strong> / <strong>1.16.0</strong> remain available for existing catalog RC installs</li>
     <li>Workflow auto-import unchanged (<code>workflows.autoImport.urls</code> + initContainers)</li>
+    <li>Fixed OpenShift Route <code>X-Forwarded-For</code> / express-rate-limit errors via <code>N8N_PROXY_HOPS=1</code> when Route or Ingress is enabled</li>
   </ul>
   <div class="code-block">helm repo update<br>helm upgrade n8n n8n-openshift/n8n --version 1.19.0 -f values-sandbox.yaml</div>
 

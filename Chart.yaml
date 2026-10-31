@@ -40,6 +40,8 @@ annotations:
   charts.openshift.io/name: n8n
   artifacthub.io/prerelease: "false"
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "Set N8N_PROXY_HOPS=1 when OpenShift Route or Ingress is enabled to fix express-rate-limit X-Forwarded-For ValidationError behind the proxy"
     - kind: changed
       description: "Update n8n app version from 2.36.7 to 2.45.7 (latest stable). Chart 1.18.0 remains available for existing catalog RC installs"
     - kind: changed

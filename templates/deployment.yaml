@@ -143,6 +143,11 @@ spec:
               value: {{ $mountPath | quote }}
             - name: XDG_CACHE_HOME
               value: {{ printf "%s/.cache" $mountPath | quote }}
+            {{- /* Behind OpenShift Route / Ingress, Express rate-limit needs trust proxy (N8N_PROXY_HOPS). */}}
+            {{- if and (or .Values.route.enabled .Values.ingress.enabled) (not (hasKey (default dict .Values.main.extraEnvVars) "N8N_PROXY_HOPS")) }}
+            - name: N8N_PROXY_HOPS
+              value: "1"
+            {{- end }}
             {{- range $key, $value := .Values.main.extraEnvVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}

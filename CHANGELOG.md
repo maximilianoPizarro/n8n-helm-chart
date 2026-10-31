@@ -11,10 +11,15 @@ Also see GitHub Releases: https://github.com/maximilianoPizarro/n8n-helm-chart/r
 - Upgrade n8n from **2.36.7** to **2.45.7** (latest stable)
 - Chart **1.18.0** / **1.17.1** / **1.16.0** remain available for existing catalog RC installs
 
+### Fixed
+
+- Behind OpenShift Route / Ingress, inject `N8N_PROXY_HOPS=1` (unless overridden) so express-rate-limit accepts `X-Forwarded-For` / `Forwarded` and stops logging `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`
+
 ### Changed
 
 - UBI image / CI default target n8n **2.45.7** (`container/Containerfile` on Node.js 24)
 - Workflow auto-import still uses `workflows.autoImport.urls` (initContainers); no ConfigMap path change
+- `values-sandbox.yaml` sets `N8N_PROXY_HOPS: "1"` explicitly
 
 ```shell
 helm upgrade n8n n8n-openshift/n8n --version 1.19.0 -f values-sandbox.yaml

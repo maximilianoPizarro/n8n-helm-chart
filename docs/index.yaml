@@ -3,6 +3,8 @@ entries:
   n8n:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: "Set N8N_PROXY_HOPS=1 when OpenShift Route or Ingress is enabled to fix express-rate-limit X-Forwarded-For ValidationError behind the proxy"
         - kind: changed
           description: "Update n8n app version from 2.36.7 to 2.45.7 (latest stable). Chart 1.18.0 remains available for existing catalog RC installs"
         - kind: changed
@@ -75,7 +77,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.45.7
-    created: "2026-10-31T18:44:47.2788427-03:00"
+    created: "2026-10-31T19:01:53.2104389-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -85,7 +87,7 @@ entries:
       a fair-code workflow automation platform with native AI capabilities for technical
       teams. Easily automate tasks across different services. Includes optional Mailpit
       for email testing and OpenShift Developer Sandbox support.
-    digest: 8d12648e774a370ce86067db9ab02dc3c80bb4ab5b12a703217d11272562cefb
+    digest: 1bdf88bce4f68504f10b2ec6e8be8a04d51bdb6e5ff2eb138e79b1e45b258e7e
     home: https://maximilianopizarro.github.io/n8n-helm-chart/
     icon: https://avatars1.githubusercontent.com/u/45487711?s=200&v=4
     keywords:
@@ -188,7 +190,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.36.7
-    created: "2026-10-31T18:44:47.2655457-03:00"
+    created: "2026-10-31T19:01:53.1989287-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -297,7 +299,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.32.7
-    created: "2026-10-31T18:44:47.253039-03:00"
+    created: "2026-10-31T19:01:53.1864147-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -400,7 +402,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 2.32.7
-    created: "2026-10-31T18:44:47.2415302-03:00"
+    created: "2026-10-31T19:01:53.1749065-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -499,7 +501,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.123.28
-    created: "2026-10-31T18:44:47.2275453-03:00"
+    created: "2026-10-31T19:01:53.1624011-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -548,7 +550,7 @@ entries:
       charts.openshift.io/name: n8n
     apiVersion: v2
     appVersion: 1.109.1
-    created: "2026-10-31T18:44:47.2071182-03:00"
+    created: "2026-10-31T19:01:53.1488854-03:00"
     dependencies:
     - condition: valkey.enabled
       name: valkey
@@ -584,4 +586,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/n8n-helm-chart/n8n-1.15.5.tgz
     version: 1.15.5
-generated: "2026-10-31T18:44:47.1784439-03:00"
+generated: "2026-10-31T19:01:53.1368746-03:00"
